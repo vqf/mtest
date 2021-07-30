@@ -1,0 +1,90 @@
+---
+title: "mtest"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{mtest}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The m-test can be used to analyze contingency tables. The main assumptions are:
+
+* The table contains the results of several *experiments*. 
+* Each experiment consists of multiple *trials* which can can yield two or more 
+exclusive *outcomes*.
+* The probability of a given outcome in any trial of each experiment is always 
+the same, regardless of previous outcomes (i. e., they are Bernouilli trials).
+* We have no prior information on the probability of each outcome in each 
+experiment.
+
+Under these assumptions, the m-test calculates the p-value under the null 
+hypothesis that the probability of each outcome is the same in every experiment.
+
+## Example 1
+
+A researcher sends 17 tissue slides for hystological examination. 
+Nine of those slides correspond to wild-type subjects (experiment 1, in 
+this case a control). The other eight slides come from subjects with a certain 
+phenotype (experiment 2). The pathologist (who is blinded to those groups) 
+examines a complex phenotype called *altered*, which the researcher hypothesizes 
+is affected by the experimental group. Therefore, there are two outcomes 
+("altered" and "not altered"). The null hypothesis is that the probability of 
+a given sample to be *altered* is 
+the same in both experimental groups. However, we do not know any of those 
+probabilities.We set a p=0.05 threshold to reject the null hypothesis. 
+The results:
+
+| Outcome             | Experiment1 | Experiment2 |
+|--------------------:|:-----------:|:-----------:|
+| Altered             | 2           | 6           |
+| Not altered         | 7           | 2           |
+
+The m-test allows the calculation of the p-value of this result 
+under the null hypothesis:
+
+```{r hyst}
+library(mtest)
+m.test(list(c(2, 7), c(6, 2)))
+```
+Therefore, we reject the null hypothesis. According to this result, the 
+probability of a samle to be altered is different in the group with a 
+phenotype and in the control group.
+
+## Example 2
+We can also analyze larger contingency tables, although the computational 
+power required can be limiting. 
+
+We have four urns with colored balls. We can draw 
+from each urn, but we do not know the proportion of colors in it. There are three 
+kinds of balls (outcomes): red, green and blue. Now we want to know if 
+the probability to draw a given color in every urn is the 
+same. This would mean that the proportion of balls of each color is the same 
+in all urns. We set that as the null hypothesis and establish a threshold p-value of 
+0.05 to reject it. To use the m-test, the probability of a given outcome (say 
+*red*) must be the same in every draw from the same urn (condition 3). This 
+means that the ball drawn must be returned to the urn before the next 
+extraction.
+
+Suppose we get these results after 9 draws in Urns1-3 and 6 draws in Urn3:
+
+| Outcome             | Urn1 | Urn2 | Urn3 | Urn3 |
+|--------------------:|:----:|:----:|:----:|:----:|
+| Red                 | 3    |  4   | 1    | 3    |
+| Green               | 3    |  5   | 2    | 2    |
+| Blue                | 3    |  0   | 6    | 1    |
+
+
+```{r multi}
+m.test(list(c(3, 3, 3), c(4, 5, 0), c(1, 2, 6), c(3, 2, 1)))
+```
+
+Therefore, we reject the null hypothesis. However, the test does not tell us 
+the cause for this rejection. There might be an excess of red balls in Urn1 or 
+perhaps the proportion of balls in all three urns is completely different. 

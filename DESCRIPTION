@@ -1,0 +1,33 @@
+Package: mtest
+Title: Direct statistical test to compare multinomial trials
+Version: 0.1.0
+Authors@R: 
+    person(given = "Victor",
+           family = "Quesada",
+           role = c("aut", "cre"),
+           email = "quesadavictor@uniovi.es",
+           comment = c(ORCID = "0000-0002-8398-3457"))
+Description: This package contains functions to compare multinomial trials under 
+    the null hypothesis that each state has the same probability in every 
+    experiment. In a multinomial trial, 
+    the probability of each state is exptected to be the same in every measure. 
+    This corresponds to random extraction of colored balls from an urn with 
+    replacement. Each experiment would consist of a number of extractions. The 
+    package offers a statistical test to ask whether the result is compatible 
+    with the null hypothesis that the probability of extracting each color is 
+    the same in all the experiments.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+LinkingTo: 
+    Rcpp
+Imports: 
+    Rcpp
+Config/testthat/edition: 3
