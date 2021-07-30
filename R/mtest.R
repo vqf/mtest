@@ -493,11 +493,12 @@ m.test <- function(experiments){
     r <- v
   }
   result <- mtest(list(val=v, desc=st, sdesc=su, r=0), cutoff, 0, 0)
-  r <- r + result
+  r <- r + result$r
   if (nr > 1){
     for (rw in 2:nr){
-      r <- r + mtest(list(val=v, desc=st, sdesc=su, r=0), cutoff,
-                     rw - 1, 0)
+      t <- mtest(list(val=v, desc=st, sdesc=su, r=0), cutoff,
+                 rw - 1, 0)
+      r <- r + t$r
     }
   }
   return(r)

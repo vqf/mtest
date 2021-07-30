@@ -9,10 +9,6 @@ sl <- function(from) {
     .Call('_mtest_sl', PACKAGE = 'mtest', from)
 }
 
-mpvals <- function(l, cutoff, rw = 1L, cl = 1L) {
-    .Call('_mtest_mpvals', PACKAGE = 'mtest', l, cutoff, rw, cl)
-}
-
 mtest <- function(l, cutoff, rw = 1L, cl = 1L) {
     .Call('_mtest_mtest', PACKAGE = 'mtest', l, cutoff, rw, cl)
 }
