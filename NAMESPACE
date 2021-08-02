@@ -2,6 +2,7 @@
 
 export(bernDist)
 export(bernPval)
+export(bpval)
 export(calCumul)
 export(fdebug)
 export(m.test)

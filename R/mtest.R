@@ -376,6 +376,7 @@ fdebug <- function(v){
   return(l);
 }
 
+#' @export
 bpval <- function(experiments){
   mex <- .toMatrix(experiments)
   df <- ncol(mex) - 1
