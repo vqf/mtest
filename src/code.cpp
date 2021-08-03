@@ -61,6 +61,46 @@ NumericMatrix sl(NumericMatrix from) {
   return t;
 }
 
+double tmtest2(NumericMatrix l, double v, double cutoff, NumericVector ns, NumericVector su, double vo){
+  double result = 0;
+  NumericMatrix st = Rcpp::clone(l);
+  uint32_t nd2 = st(2, 1);
+  vo = vo * ((ns(2) + 1) * (st(1, 1) + 1) * (su(2) + 1)) / ((ns(1) + 1) * (st(2, 2) + 1) * (su(1) + 1));
+  while (st(2, 2) < nd2){;
+    v = v + vo / (ns(2) + 1);
+    if (v <= cutoff){
+      result += v;
+    }
+    st(2, 1) = st(2, 1) - 1;
+    st(2, 2) = st(2, 2) + 1;
+    su(1) = su(1) - 1;
+    su(2) = su(2) + 1;
+    vo = vo * (st(2, 1)+1) * (1 + su(2)) / ((1 + st(2, 2)) * (su(1)+1));
+  }
+  return result;
+}
+
+
+// [[Rcpp::export]]
+double tmtest(NumericMatrix l, double v, double cutoff, NumericVector ns, NumericVector su, double vo){
+  double result = 0;
+  NumericMatrix st = Rcpp::clone(l);
+  uint32_t nd1 = st(1, 2);
+  while (st(1, 1) < nd1){
+    Rprintf("%u\n", st(1, 1));
+    v = v + vo / ((double)(ns(1)) + 1);
+    if (v <= cutoff){
+      result += v;
+    }
+    st(1, 1) = st(1, 1) + 1;
+    st(1, 2) = st(1, 2) - 1;
+    su(1) = su(1) + 1;
+    su(2) = su(2) - 1;
+    vo = vo * ((double)(st(1, 2))+1) * (1 + (double)(su(1))) / ((1 + (double)(st(1, 1))) * ((double)(su(2))+1));
+    result += tmtest2(st, v, cutoff, ns, su, vo);
+  }
+  return result;
+}
 
 
 // [[Rcpp::export]]

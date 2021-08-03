@@ -461,12 +461,16 @@ tbpval <- function(experiments){
 tailed.m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
-  df <- ncol(mex) - 1
-  nr <- nrow(mex)
   st <- .tzero(mex)
-  su <- colSums(st)
   n <- sum(mex)
-
+  denom <- (n + 1) * (n + 2) * binomial.coef(n, st[1, 2])
+  v <- 1 / denom
+  su <- colSums(st)
+  ns <- rowSums(st)
+  vo <- 1 / ((n + 2) * binomial.coef(n+1, st[1, 2]+1))
+  vo <- vo * (st[1, 2]+1) * (1 + su[1]) / ((1 + st[1, 1]) * (su[2]+1))
+  result <- tmtest(st, v, cutoff, ns, su, vo)
+  return(result)
 }
 
 #' p-val calculation to compare multinomial tests

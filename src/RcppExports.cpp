@@ -27,6 +27,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tmtest
+double tmtest(NumericMatrix l, double v, double cutoff, NumericVector ns, NumericVector su, double vo);
+RcppExport SEXP _mtest_tmtest(SEXP lSEXP, SEXP vSEXP, SEXP cutoffSEXP, SEXP nsSEXP, SEXP suSEXP, SEXP voSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type l(lSEXP);
+    Rcpp::traits::input_parameter< double >::type v(vSEXP);
+    Rcpp::traits::input_parameter< double >::type cutoff(cutoffSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type su(suSEXP);
+    Rcpp::traits::input_parameter< double >::type vo(voSEXP);
+    rcpp_result_gen = Rcpp::wrap(tmtest(l, v, cutoff, ns, su, vo));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mtest
 List mtest(List l, double cutoff, uint8_t rw, uint8_t cl);
 RcppExport SEXP _mtest_mtest(SEXP lSEXP, SEXP cutoffSEXP, SEXP rwSEXP, SEXP clSEXP) {
@@ -45,6 +61,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_mtest_traverse", (DL_FUNC) &_mtest_traverse, 1},
     {"_mtest_sl", (DL_FUNC) &_mtest_sl, 1},
+    {"_mtest_tmtest", (DL_FUNC) &_mtest_tmtest, 6},
     {"_mtest_mtest", (DL_FUNC) &_mtest_mtest, 4},
     {NULL, NULL, 0}
 };
