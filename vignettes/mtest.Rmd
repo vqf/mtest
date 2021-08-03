@@ -19,8 +19,12 @@ The m-test can be used to analyze contingency tables. The main assumptions are:
 * The table contains the results of several *experiments*. 
 * Each experiment consists of multiple *trials* which can can yield two or more 
 exclusive *outcomes*.
+* The number of trials in each experiment is fixed, either chosen beforehand 
+or simply not chosen by the researcher. The number of times each outcome occurs 
+is not fixed, any combination is possible.
 * The probability of a given outcome in any trial of each experiment is always 
 the same, regardless of previous outcomes (i. e., they are Bernouilli trials).
+This happens for instance when we repeatedly toss a coin. 
 * We have no prior information on the probability of each outcome in each 
 experiment.
 
@@ -46,7 +50,9 @@ The results:
 | Altered             | 2           | 6           |
 | Not altered         | 7           | 2           |
 
-The m-test allows the calculation of the p-value of this result 
+The m-test allows the calculation of the p-value of this result. The input can 
+be a matrix like the one depicted in the table. You can also provide each 
+experiment as a list of vectors with the description of each experiment.
 under the null hypothesis:
 
 ```{r hyst}
@@ -74,7 +80,7 @@ extraction.
 
 Suppose we get these results after 9 draws in Urns1-3 and 6 draws in Urn3:
 
-| Outcome             | Urn1 | Urn2 | Urn3 | Urn3 |
+| Outcome             | Urn1 | Urn2 | Urn3 | Urn4 |
 |--------------------:|:----:|:----:|:----:|:----:|
 | Red                 | 3    |  4   | 1    | 3    |
 | Green               | 3    |  5   | 2    | 2    |
