@@ -469,7 +469,7 @@ tailed.m.test <- function(experiments){
   ns <- rowSums(st)
   vo <- 1 / ((n + 2) * binomial.coef(n+1, st[1, 2]+1))
   vo <- vo * (st[1, 2]+1) * (1 + su[1]) / ((1 + st[1, 1]) * (su[2]+1))
-  result <- tmtest(st, v, cutoff, ns, su, vo)
+  result <- 2 * tmtest(st, v, cutoff, ns, su, vo)
   return(result)
 }
 

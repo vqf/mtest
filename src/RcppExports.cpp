@@ -28,18 +28,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // tmtest
-double tmtest(NumericMatrix l, double v, double cutoff, NumericVector ns, NumericVector su, double vo);
-RcppExport SEXP _mtest_tmtest(SEXP lSEXP, SEXP vSEXP, SEXP cutoffSEXP, SEXP nsSEXP, SEXP suSEXP, SEXP voSEXP) {
+double tmtest(NumericMatrix l, double v, double cutoff, NumericVector nss, NumericVector sus, double vo);
+RcppExport SEXP _mtest_tmtest(SEXP lSEXP, SEXP vSEXP, SEXP cutoffSEXP, SEXP nssSEXP, SEXP susSEXP, SEXP voSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type l(lSEXP);
     Rcpp::traits::input_parameter< double >::type v(vSEXP);
     Rcpp::traits::input_parameter< double >::type cutoff(cutoffSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type su(suSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nss(nssSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sus(susSEXP);
     Rcpp::traits::input_parameter< double >::type vo(voSEXP);
-    rcpp_result_gen = Rcpp::wrap(tmtest(l, v, cutoff, ns, su, vo));
+    rcpp_result_gen = Rcpp::wrap(tmtest(l, v, cutoff, nss, sus, vo));
     return rcpp_result_gen;
 END_RCPP
 }

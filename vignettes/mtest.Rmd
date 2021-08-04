@@ -1,5 +1,5 @@
 ---
-title: "mtest"
+title: "m-test"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{mtest}
@@ -74,11 +74,13 @@ the probability to draw a given color in every urn is the
 same. This would mean that the proportion of balls of each color is the same 
 in all urns. We set that as the null hypothesis and establish a threshold p-value of 
 0.05 to reject it. To use the m-test, the probability of a given outcome (say 
-*red*) must be the same in every draw from the same urn (condition 3). This 
-means that the ball drawn must be returned to the urn before the next 
-extraction.
+*red*) must be the same in every draw from the same urn. However, when we 
+draw a red ball, the number of red balls in the urn is lower than before. This 
+means that in the next draw the probability to extract a red ball is lower.
+Therefore, for the m-test to be applicable, the ball drawn must be returned to 
+the urn before the next extraction.
 
-Suppose we get these results after 9 draws in Urns1-3 and 6 draws in Urn3:
+Suppose we get these results after 9 draws in Urns1-3 and 6 draws in Urn4:
 
 | Outcome             | Urn1 | Urn2 | Urn3 | Urn4 |
 |--------------------:|:----:|:----:|:----:|:----:|

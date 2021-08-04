@@ -1,3 +1,4 @@
 ^mtest\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^Figs\.*$
