@@ -450,6 +450,9 @@ tbpval <- function(experiments){
 #' Two-tail p-val calculation to compare binomial tests
 #'
 #' @inheritParams bernPval
+#' @param lower boolean indicating whether the probability of success in the
+#' second experiment in lower than the probability of success in the first
+#' experiment. Defaults to `true`.
 #'
 #' @return p-value for the null hypothesis (the probability of success in the
 #' second experiment is lower than the probability of success in the first
@@ -458,7 +461,7 @@ tbpval <- function(experiments){
 #'
 #' @examples
 #' tailed.m.test(list(c(10, 8), c(10, 3)))
-tailed.m.test <- function(experiments){
+tailed.m.test <- function(experiments, lower=T){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
   st <- .tzero(mex)
@@ -476,6 +479,8 @@ tailed.m.test <- function(experiments){
 #' p-val calculation to compare multinomial tests
 #'
 #' @inheritParams bernPval
+#' @param null.hypothesis a character string specifying the alternative hypothesis,
+#' must be one of "equal" (default), "higher" or "lower".
 #'
 #' @return p-value for the null hypothesis (all underlying probabilities
 #' are the same in every experiment)
@@ -483,7 +488,7 @@ tailed.m.test <- function(experiments){
 #'
 #' @examples
 #' m.test(list(c(8, 2), c(4, 7)))
-m.test <- function(experiments){
+m.test <- function(experiments, null.hypothesis="equal"){
   mex <- .toMatrix(experiments)
   cutoff <- bpval(experiments)
   df <- ncol(mex) - 1
@@ -517,6 +522,7 @@ modrunif <- function(nc, low, high, dround = 0){
   return(result);
 }
 
+#' @export
 .mc <- function(n, nc, algo=1, NRUNIF=0){
   result <- matrix(nrow = n, ncol=nc)
   if (algo == 1){
@@ -527,6 +533,7 @@ modrunif <- function(nc, low, high, dround = 0){
     }
   }
   if (algo == 2){
+    message('Alg2')
     df <- nc - 1
     for (i in 1:n){
       rord <- sample(1:nc, nc, replace = F)
@@ -554,6 +561,16 @@ modrunif <- function(nc, low, high, dround = 0){
         t <- max(tt, t - tt)
       }
       result[i, lst] <- t
+    }
+  }
+  if (algo == 4){
+    for (i in 1:n){
+      rord <- c(sort(rep(modrunif(nc-1, 0, 1, NRUNIF)), decreasing = F), 1)
+      r2 <- rord
+      for (j in 2:length(r2)){
+        r2[j] <- rord[j] - rord[j-1]
+      }
+      result[i, ] <- r2
     }
   }
   return(result)

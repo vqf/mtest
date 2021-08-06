@@ -4,7 +4,7 @@
 \alias{tailed.m.test}
 \title{Two-tail p-val calculation to compare binomial tests}
 \usage{
-tailed.m.test(experiments)
+tailed.m.test(experiments, lower = T)
 }
 \arguments{
 \item{experiments}{List of multinomial trials. Each
@@ -13,6 +13,10 @@ The function also accepts a matrix (one row per experiment) In a
 \emph{pure} Bernouilli trial, this would be \code{c(number_of_successes,
   number_of_failures)}. The number and order of categories must be the same
 in each trial.}
+
+\item{lower}{boolean indicating whether the probability of success in the
+second experiment in lower than the probability of success in the first
+experiment. Defaults to \code{true}.}
 }
 \value{
 p-value for the null hypothesis (the probability of success in the

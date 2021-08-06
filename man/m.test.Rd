@@ -4,7 +4,7 @@
 \alias{m.test}
 \title{p-val calculation to compare multinomial tests}
 \usage{
-m.test(experiments)
+m.test(experiments, null.hypothesis = "equal")
 }
 \arguments{
 \item{experiments}{List of multinomial trials. Each
@@ -13,6 +13,9 @@ The function also accepts a matrix (one row per experiment) In a
 \emph{pure} Bernouilli trial, this would be \code{c(number_of_successes,
   number_of_failures)}. The number and order of categories must be the same
 in each trial.}
+
+\item{null.hypothesis}{a character string specifying the alternative hypothesis,
+must be one of "equal" (default), "higher" or "lower".}
 }
 \value{
 p-value for the null hypothesis (all underlying probabilities

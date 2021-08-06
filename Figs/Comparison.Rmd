@@ -1,14 +1,14 @@
 ---
-title: "Monte Carlo simulations"
+title: "Comparison - Monte Carlo simulations"
 output: html_notebook
 ---
 
 
 ```{r}
 library(mtest)
-calgo <- 4
+calgo <- 1
 set.seed(42)
-ex <- list(c(6, 0, 0, 0, 0), c(4, 0, 0, 0, 0))
+ex <- list(c(17, 0), c(11, 0))
 # MC Simulation
 m <- mcm(ex, 100000, algo=calgo, NRUNIF = 0)
 m <- calCumul(m)
@@ -32,6 +32,38 @@ title('m-test p-value')
 abline(0, 1, col='red', lty=2)
 abline(k, col="black", lty=1)
 legend(legend = c("Regression", "Slope=1"), lty = c(1, 2), col=c('black', 'red'), x='right', y='middle')
+```
+
+```{r echo=F, warning=F, message=F, results='hide'}
+library(Barnard)
+n1 <- 17
+n2 <- 11
+exb <- list(c(n1, 0), c(n2, 0))
+# MC Simulation
+mb <- mcm(exb, 100000, algo=calgo, NRUNIF = 0)
+mb <- calCumul(mb)
+s <- matrix(nrow = 0, ncol = 2)
+for (i in 1:n1){
+  for (j in 1:n2){
+    dsc <- c(i, j, n1-i, n2-j)
+    nm <- paste(dsc, collapse = '_')
+    br <- barnard.test(dsc[1], dsc[2], dsc[3], dsc[4])
+    if (!is.null(br$p.value[2]) && !is.null(m[[n]])){
+      v <- as.numeric(br$p.value[[2]])
+      w <- mb[[nm]]$cval
+      s <- rbind(s, c(v, w))
+    }
+  }
+}
+colnames(s) <- c('Theoretical', 'Simulated')
+smoothScatter(s)
+title('Barnard test p-value')
+kb <- lm(s[,2] ~ s[,1] + 0)
+kb
+abline(0, 1, col='red', lty=2)
+abline(kb, col="black", lty=1)
+legend(legend = c("Regression", "Slope=1"), lty = c(1, 2), col=c('black', 'red'), x='right', y='middle')
+
 ```
 ```{r}
 mnc <- ncol(m[[1]]$desc)
