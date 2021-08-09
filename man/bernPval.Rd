@@ -9,10 +9,12 @@ bernPval(experiments = list())
 \arguments{
 \item{experiments}{List of multinomial trials. Each
 trial is codified as a vector with the number of results in each category.
-The function also accepts a matrix (one row per experiment) In a
-\emph{pure} Bernouilli trial, this would be \code{c(number_of_successes,
-  number_of_failures)}. The number and order of categories must be the same
-in each trial.}
+The number and order of categories must be the same
+in every experiment.
+In a
+\emph{binomial} experiment, this would be \code{c(number_of_successes,
+  number_of_failures)}. The function also accepts a matrix (one column per
+experiment).}
 }
 \value{
 p-value according to the null hypothesis that the probability of each

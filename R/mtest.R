@@ -8,10 +8,12 @@ NULL
 #'
 #' @param experiments List of multinomial trials. Each
 #'   trial is codified as a vector with the number of results in each category.
-#'   The function also accepts a matrix (one row per experiment) In a
-#'   \emph{pure} Bernouilli trial, this would be \code{c(number_of_successes,
-#'   number_of_failures)}. The number and order of categories must be the same
-#'   in each trial.
+#'   The number and order of categories must be the same
+#'   in every experiment.
+#'   In a
+#'   \emph{binomial} experiment, this would be \code{c(number_of_successes,
+#'   number_of_failures)}. The function also accepts a matrix (one column per
+#'   experiment).
 #'
 #' @return p-value according to the null hypothesis that the probability of each
 #'   outcome is the same in every experiment
@@ -449,19 +451,21 @@ tbpval <- function(experiments){
 
 #' Two-tail p-val calculation to compare binomial tests
 #'
-#' @inheritParams bernPval
-#' @param lower boolean indicating whether the probability of success in the
-#' second experiment in lower than the probability of success in the first
-#' experiment. Defaults to `true`.
+#' This function only takes two experiments with two outcomes, usually called
+#' \emph{sucess} and \emph{failure}. The null hypothesis states that the
+#' probability of success in the first experiment is higher than the
+#' probability of success in the second experiment. Therefore, the order
+#' of the experiments is important.
 #'
-#' @return p-value for the null hypothesis (the probability of success in the
-#' second experiment is lower than the probability of success in the first
-#' experiment)
+#' @inheritParams bernPval
+#'
+#' @return p-value for the null hypothesis.
 #' @export
 #'
 #' @examples
+#' # p(success in exp1) > p(success in exp2)
 #' tailed.m.test(list(c(10, 8), c(10, 3)))
-tailed.m.test <- function(experiments, lower=T){
+tailed.m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
   st <- .tzero(mex)
@@ -479,8 +483,6 @@ tailed.m.test <- function(experiments, lower=T){
 #' p-val calculation to compare multinomial tests
 #'
 #' @inheritParams bernPval
-#' @param null.hypothesis a character string specifying the alternative hypothesis,
-#' must be one of "equal" (default), "higher" or "lower".
 #'
 #' @return p-value for the null hypothesis (all underlying probabilities
 #' are the same in every experiment)
@@ -523,18 +525,18 @@ modrunif <- function(nc, low, high, dround = 0){
 }
 
 #' @export
-.mc <- function(n, nc, algo=1, NRUNIF=0){
-  result <- matrix(nrow = n, ncol=nc)
+.mc <- function(n, nc, nr, algo=1, NRUNIF=0){
+  result <- matrix(nrow = n*nr, ncol=nc)
   if (algo == 1){
     for (r in 1:n){
       w <- modrunif(nc, 0, 1, NRUNIF)
       w <- w / sum(w)
-      result[r,] <- w
+      for (i in 1:nr){
+        result[(r-1) * nr + i,] <- w
+      }
     }
   }
   if (algo == 2){
-    message('Alg2')
-    df <- nc - 1
     for (i in 1:n){
       rord <- sample(1:nc, nc, replace = F)
       fst <- rord[1:df]
@@ -542,14 +544,17 @@ modrunif <- function(nc, low, high, dround = 0){
       t <- 1
       for (d in fst){
         tt <- as.numeric(modrunif(1, 0, t, NRUNIF))
-        result[i, d] <- tt
+        for (j in 1:nr){
+          result[nr * (i-1) + j, d] <- tt
+        }
         t <- t - tt
       }
-      result[i, lst] <- t
+      for (j in 1:nr){
+        result[nr * (i-1) + j, lst] <- t
+      }
     }
   }
   if (algo == 3){
-    df <- nc - 1
     for (i in 1:n){
       rord <- sample(1:nc, nc, replace = F)
       fst <- rord[1:df]
@@ -557,10 +562,14 @@ modrunif <- function(nc, low, high, dround = 0){
       t <- 1
       for (d in fst){
         tt <- as.numeric(modrunif(1, 0, t, NRUNIF))
-        result[i, d] <- min(tt, t-tt)
+        for (j in 1:nr){
+          result[nr * (i-1) + j, d] <- min(tt, t-tt)
+        }
         t <- max(tt, t - tt)
       }
-      result[i, lst] <- t
+      for (j in 1:nr){
+        result[nr * (i-1) + j, lst] <- t
+      }
     }
   }
   if (algo == 4){
@@ -570,7 +579,18 @@ modrunif <- function(nc, low, high, dround = 0){
       for (j in 2:length(r2)){
         r2[j] <- rord[j] - rord[j-1]
       }
-      result[i, ] <- r2
+      for (j in 1:nr){
+        result[nr * (i-1) + j, ] <- r2
+      }
+    }
+  }
+  if (algo == 5){
+    for (i in 1:n){
+      rord <- c(sort(rep(modrunif(nr, 0, 1, NRUNIF)), decreasing = T), 1)
+      r2 <- rord
+      for (j in 1:nr){
+        result[nr * (i-1) + j, ] <- c(r2[j], 1-r2[j])
+      }
     }
   }
   return(result)
@@ -592,19 +612,21 @@ mcm <- function(experiments=list(), n=10000, algo=1, NRUNIF=0){
   mex <- .toMatrix(experiments)
   startDesc <- .zero(mex)
   r1 <- list()
-  rp <- .mc(n, ncol(mex), algo = algo, NRUNIF = NRUNIF)
+  rp <- .mc(n, ncol(mex), nrow(mex), algo = algo, NRUNIF = NRUNIF)
   for (i in 1:n){
     mr <- matrix(c(0), ncol = ncol(mex), nrow = nrow(mex))
-    for (r in 1:nrow(startDesc)){
+    nr <- nrow(startDesc)
+    for (r in 1:nr){
+      w <- nr * (i-1) + r
       t <- startDesc[r, 1]
       for (x in 1:t){
         p <- as.numeric(modrunif(1, 0, 1, NRUNIF))
         d <- 1
-        s <- 1 - rp[i, 1]
-        while (d < ncol(mex) && s > p){
+        s <- rp[w, 1]
+        while (d < ncol(mex) && s < p){
           d <- d + 1
-          v <- rp[i, d]
-          s <- s - v
+          v <- rp[w, d]
+          s <- s + v
         }
         mr[r, d] <- mr[r, d] + 1
       }

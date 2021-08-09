@@ -32,11 +32,85 @@ title('m-test p-value')
 abline(0, 1, col='red', lty=2)
 abline(k, col="black", lty=1)
 legend(legend = c("Regression", "Slope=1"), lty = c(1, 2), col=c('black', 'red'), x='right', y='middle')
+tolabel <- c()
+for (n in tolabel){
+  if (!is.null(m[[n]])){
+    v <- f[[n]]$cval
+    x <- v
+    y <- m[[n]]$cval
+    t <- m[[n]]$desc
+    l <- paste(t[1, 1], ' ', t[2, 1], '\n', t[1, 2], ' ', t[2, 2], sep = '')
+    text(x, y, l)
+  }
+}
 ```
 ```{r}
 mnc <- ncol(m[[1]]$desc)
 toh <- Reduce(init = matrix(ncol = mnc, nrow = 0), function(x, y){rbind(x, matrix(rep(as.vector(y[[1]]), y[[2]]), ncol = mnc, byrow = F))}, Map(function(x){list(as.matrix(x$desc), x$n)}, m))
 for (i in 1:ncol(toh)){
   hist(toh[,i], breaks = c(-1:max(toh[,i])))
+}
+```
+
+
+```{r twobytwo}
+calgo <- 4
+texp <- list(c(1, 5), c(4, 8))
+tm <- mcm(texp, 200000, algo=calgo, NRUNIF = 0)
+tm <- calCumul(tm) 
+tf <- bernDist(texp)
+tf <- calCumul(tf)
+names(tf) <- mapply(function(x){tmp <- paste(as.vector(x$desc), collapse = '_'); names(x) <- tmp}, tf)
+tr <- matrix(ncol = 2, nrow = 0)
+for (n in names(tm)){
+  tr <- rbind(tr, c(tf[[n]]$cval, tm[[n]]$cval ))
+}
+colnames(tr) <- c('Theoretical', 'Simulated')
+smoothScatter(tr)
+title('2x2 m-test p-value')
+abline(0, 1, col='red', lty=2)
+abline(k, col="black", lty=1)
+legend(legend = c("Regression", "Slope=1"), lty = c(1, 2), col=c('black', 'red'), x='right', y='middle')
+tolabel <- c("6_0_0_12", "3_6_3_6", "6_8_0_4")
+for (n in tolabel){
+  if (!is.null(tm[[n]])){
+    v <- tf[[n]]$cval
+    x <- v
+    y <- tm[[n]]$cval
+    t <- tm[[n]]$desc
+    l <- paste(t[1, 1], ' ', t[2, 1], '\n', t[1, 2], ' ', t[2, 2], sep = '')
+    points(x, y, pch = 2)
+    text(x, y, l)
+  }
+}
+```
+ 
+
+```{r tail}
+calgo <- 5
+texp <- list(c(1, 5), c(4, 8))
+tm <- mcm(texp, 200000, algo=calgo, NRUNIF = 0)
+tm <- calCumul(tm) 
+tr <- matrix(ncol = 2, nrow = 0)
+for (n in names(tm)){
+  v <- tailed.m.test(t(tm[[n]]$desc))
+  tr <- rbind(tr, c(v,tm[[n]]$cval ))
+}
+colnames(tr) <- c('Theoretical', 'Simulated')
+smoothScatter(tr)
+title('two-tail m-test p-value')
+abline(0, 1, col='red', lty=2)
+abline(k, col="black", lty=1)
+legend(legend = c("Regression", "Slope=1"), lty = c(1, 2), col=c('black', 'red'), x='right', y='middle')
+for (n in tolabel){
+  if (!is.null(tm[[n]])){
+    v <- tailed.m.test(t(tm[[n]]$desc))
+    x <- v
+    y <- tm[[n]]$cval
+    t <- tm[[n]]$desc
+    l <- paste(t[1, 1], ' ', t[2, 1], '\n', t[1, 2], ' ', t[2, 2], sep = '')
+    points(x, y, pch = 2)
+    text(x, y, l)
+  }
 }
 ```

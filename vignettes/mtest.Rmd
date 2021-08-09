@@ -31,7 +31,7 @@ experiment.
 Under these assumptions, the m-test calculates the p-value under the null 
 hypothesis that the probability of each outcome is the same in every experiment.
 
-## Example 1
+## Example 1 - binomial test
 
 A researcher sends 17 tissue slides for hystological examination. 
 Nine of those slides correspond to wild-type subjects (experiment 1, in 
@@ -60,10 +60,52 @@ library(mtest)
 m.test(list(c(2, 7), c(6, 2)))
 ```
 Therefore, we reject the null hypothesis. According to this result, the 
-probability of a samle to be altered is different in the group with a 
+probability of a sample to be altered is different in the group with a 
 phenotype and in the control group.
 
-## Example 2
+## Example 2 - two-tail binomial test
+Only for a 2x2 contingency table, we can also test the hypothesis that one 
+probability is higher than the other with the `tailed.m.test` function. In 
+this example, we will call the outcomes `success` (outcome 1) and `failure`
+(outcome 2). The null hypothesis states that the probability of success 
+in the first experiment is higher than the probability of success in the second 
+experiment. Therefore, we must place the experiment where we hypothesize the 
+highest probability of success as the first experiment.
+
+This example is taken from Prof. Timothy Hanson's course 
+`Stat 205: Elementary Statistics for the Biological and Life Sciences`
+([link](https://www.brighamresearcheducation.org/wp-content/uploads/2017/05/Topics-in-Biostatistics.categorical-data-analysis-and-logistic-regression.part-1..05.02.17.pdf])):
+
+> * Migraine headache patients took part in a double-blind clinical
+trial to assess experimental surgery.
+> * 75 patients were randomly assigned to real surgery on
+migraine trigger sites (n1 = 49) or sham surgery (n2 = 26) in
+which an incision was made but nothing else.
+> * The surgeons hoped that patients would experience \a
+substantial reduction in migraine headaches," which we will
+label as success.
+
+Therefore, the null hypothesis is that the probability of success is higher in 
+the placebo group. Setting a limit p-val of 0.05,
+
+
+| Migraine reduction?    | Surgery     | Placebo     |
+|-----------------------:|:-----------:|:-----------:|
+| Success                | 41          | 15          |
+| No Success             | 8           | 11          |
+
+
+```{r tailed}
+tailed.m.test(list(c(15, 11), c(41, 8)))
+```
+
+In a strict sense, this model does not contemplate the case where both 
+probabilities are equal, and you may want to also discard that null 
+hypothesis with `m.test`. However, using the same data for more than one 
+test might be considered multiple hypothesis. You may want to adjust the 
+limit p-value accordingly.
+
+## Example 3 - multinomial test
 We can also analyze larger contingency tables, although the computational 
 power required can be limiting. 
 
@@ -73,12 +115,20 @@ kinds of balls (outcomes): red, green and blue. Now we want to know if
 the probability to draw a given color in every urn is the 
 same. This would mean that the proportion of balls of each color is the same 
 in all urns. We set that as the null hypothesis and establish a threshold p-value of 
-0.05 to reject it. To use the m-test, the probability of a given outcome (say 
+0.05 to reject it. 
+To use the m-test in this setting, there are at least two considerations:
+
+* The probability of a given outcome (say 
 *red*) must be the same in every draw from the same urn. However, when we 
 draw a red ball, the number of red balls in the urn is lower than before. This 
 means that in the next draw the probability to extract a red ball is lower.
 Therefore, for the m-test to be applicable, the ball drawn must be returned to 
-the urn before the next extraction.
+the urn before the next extraction. This is called *drawing with replacement*.
+* The last assumption of the m-test says that we know nothing about the 
+probability of any outcome. In this case, we know that this probability is 
+discrete, as it can only take rational values. This means that the test is 
+not exact. The result will approach the real p-value as the total number of 
+balls in the urn increases.
 
 Suppose we get these results after 9 draws in Urns1-3 and 6 draws in Urn4:
 
@@ -95,4 +145,4 @@ m.test(list(c(3, 3, 3), c(4, 5, 0), c(1, 2, 6), c(3, 2, 1)))
 
 Therefore, we reject the null hypothesis. However, the test does not tell us 
 the cause for this rejection. There might be an excess of red balls in Urn1 or 
-perhaps the proportion of balls in all three urns is completely different. 
+perhaps the proportion of balls in all four urns is completely different. 

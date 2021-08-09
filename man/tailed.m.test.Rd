@@ -4,28 +4,29 @@
 \alias{tailed.m.test}
 \title{Two-tail p-val calculation to compare binomial tests}
 \usage{
-tailed.m.test(experiments, lower = T)
+tailed.m.test(experiments)
 }
 \arguments{
 \item{experiments}{List of multinomial trials. Each
 trial is codified as a vector with the number of results in each category.
-The function also accepts a matrix (one row per experiment) In a
-\emph{pure} Bernouilli trial, this would be \code{c(number_of_successes,
-  number_of_failures)}. The number and order of categories must be the same
-in each trial.}
-
-\item{lower}{boolean indicating whether the probability of success in the
-second experiment in lower than the probability of success in the first
-experiment. Defaults to \code{true}.}
+The number and order of categories must be the same
+in every experiment.
+In a
+\emph{binomial} experiment, this would be \code{c(number_of_successes,
+  number_of_failures)}. The function also accepts a matrix (one column per
+experiment).}
 }
 \value{
-p-value for the null hypothesis (the probability of success in the
-second experiment is lower than the probability of success in the first
-experiment)
+p-value for the null hypothesis.
 }
 \description{
-Two-tail p-val calculation to compare binomial tests
+This function only takes two experiments with two outcomes, usually called
+\emph{sucess} and \emph{failure}. The null hypothesis states that the
+probability of success in the first experiment is higher than the
+probability of success in the second experiment. Therefore, the order
+of the experiments is important.
 }
 \examples{
+# p(success in exp1) > p(success in exp2)
 tailed.m.test(list(c(10, 8), c(10, 3)))
 }

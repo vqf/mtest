@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 library(mtest)
-calgo <- 1
+calgo <- 4
 set.seed(42)
 ex <- list(c(17, 0), c(11, 0))
 # MC Simulation
