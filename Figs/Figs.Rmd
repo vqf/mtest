@@ -38,7 +38,7 @@ z2 <- matrix(nrow = n1+1, ncol = n2+1)
 for (x in s1){
   for (y in s2){
     z[x+1, y+1] <- m.test(list(c(x, n1-x), c(y, n2-y)))
-    z2[x+1, y+1] <- tailed.m.test(list(c(x, n1-x), c(y, n2-y)))
+    z2[x+1, y+1] <- os.m.test(list(c(x, n1-x), c(y, n2-y)))
   }
 }
 

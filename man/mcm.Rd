@@ -4,7 +4,7 @@
 \alias{mcm}
 \title{Monte Carlo simulation of multinomial process}
 \usage{
-mcm(experiments = list(), n = 10000, algo = 1, NRUNIF = 0)
+mcm(experiments = list(), n = 10000, algo = 4, NRUNIF = 0)
 }
 \arguments{
 \item{experiments}{List of multinomial trials. Each
@@ -18,7 +18,11 @@ experiment).}
 
 \item{n}{Number of simulations to run}
 
-\item{algo}{Algorithm for pseudorandom matrix}
+\item{algo}{Algorithm for generating the pseudorandom matrix. The two
+most relevant algorithms are \code{4} (two-sided) and \code{5} (one-sided).}
+
+\item{NRUNIF}{number of decimal places in the pseudo-random numbers.
+Only for debugging purposes.}
 }
 \value{
 List of results, as described in \link{bernDist}
@@ -26,6 +30,33 @@ List of results, as described in \link{bernDist}
 \description{
 Monte Carlo simulation of multinomial process
 }
+\section{Details}{
+
+Algorithms \code{1-4} assume that the probability of each outcome is the same
+in every experiment, and therefore the alternative hypothesis
+is that at least one of the probabilities is different (either higer or
+lower) in at least one experiment. Algorithm \code{5} only works on \verb{2x2}
+tables and assumes that the probability of success in the first experiment
+is higher than in the second experiment. Each algorithm divides the interval
+\verb{[0, 1]} in as many sub-intervals as outcomes (\code{nc}), with the first
+sub-interval \verb{[0, p_1]} and the last \verb{(p_nc-1, 1]}:
+\enumerate{
+\item Generate \code{nc - 1} pseudo-random numbers and divide by their sum. The
+resulting values are biased towards \code{0.5}.
+\item Generate a pseudo-random number \code{p1} between 0 and 1. Then recursively
+generate numbers between \code{1-sum(p1, p2, ...)} until \code{nc - 1} numbers have
+been provided. Assign every sub-interval to a pseudo-randomly chosen
+outcome. The resulting values are biased towards \code{0} if \code{nc > 2}.
+\item Like \code{2}, but the sub-interval that is sub-divided is always the largest
+remaining. Less biased than \code{2} if \code{nc > 2}.
+\item Generate \code{nc - 1} pseudo-random numbers in \verb{[0, 1]}, sort them and
+use them to divide the interval. This is the default algorithm.
+\item Same as \code{4}, but one-sided and only for \verb{2x2} tables. The sub-intervals
+are generated twice, and the result with a lower probability of success is
+assigned to the second experiment.
+}
+}
+
 \examples{
-mcm(list(c(4, 5), c(6, 7)), n=1000)
+mcm(list(c(4, 5), c(6, 7)), n=1000, algo=4)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/mtest.R
 \name{m.test}
 \alias{m.test}
-\title{p-val calculation to compare multinomial tests}
+\title{p-val calculation to compare multinomial trials}
 \usage{
 m.test(experiments, null.hypothesis = "equal")
 }
@@ -17,11 +17,11 @@ In a
 experiment).}
 }
 \value{
-p-value for the null hypothesis (all underlying probabilities
+p-value for the null hypothesis (all underlying outcome probabilities
 are the same in every experiment)
 }
 \description{
-p-val calculation to compare multinomial tests
+p-val calculation to compare multinomial trials
 }
 \examples{
 m.test(list(c(8, 2), c(4, 7)))

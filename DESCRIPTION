@@ -16,6 +16,9 @@ Description: This package contains functions to compare multinomial trials under
     package offers a statistical test to ask whether the result is compatible 
     with the null hypothesis that the probability of extracting each color is 
     the same in all the experiments.
+    The algorithm of mtest is similar to that of Barnard's test, but the 
+    nuisance parameter is integrated over all possible values under the 
+    null hypothesis.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

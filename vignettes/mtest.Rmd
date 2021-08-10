@@ -63,9 +63,9 @@ Therefore, we reject the null hypothesis. According to this result, the
 probability of a sample to be altered is different in the group with a 
 phenotype and in the control group.
 
-## Example 2 - two-tail binomial test
+## Example 2 - one-sided binomial test
 Only for a 2x2 contingency table, we can also test the hypothesis that one 
-probability is higher than the other with the `tailed.m.test` function. In 
+probability is higher than the other with the `os.m.test` function. In 
 this example, we will call the outcomes `success` (outcome 1) and `failure`
 (outcome 2). The null hypothesis states that the probability of success 
 in the first experiment is higher than the probability of success in the second 
@@ -96,14 +96,13 @@ the placebo group. Setting a limit p-val of 0.05,
 
 
 ```{r tailed}
-tailed.m.test(list(c(15, 11), c(41, 8)))
+os.m.test(list(c(15, 11), c(41, 8)))
 ```
 
-In a strict sense, this model does not contemplate the case where both 
-probabilities are equal, and you may want to also discard that null 
-hypothesis with `m.test`. However, using the same data for more than one 
-test might be considered multiple hypothesis. You may want to adjust the 
-limit p-value accordingly.
+Therefore, we can reject the null hypothesis. For stronger evidence, we can 
+also use `m.test` to reject the null hypothesis that both probabilities are 
+equal and accept the alternative hypothesis that the probability of success 
+is higher in the `Surgery` group.
 
 ## Example 3 - multinomial test
 We can also analyze larger contingency tables, although the computational 

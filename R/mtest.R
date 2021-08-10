@@ -2,7 +2,8 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' p-val calculation to compare mulinomial trials
+#' p-val calculation to compare mulinomial trials. This function is R only,
+#' use `m.test` for a faster alternative.
 #'
 #'
 #'
@@ -16,7 +17,7 @@ NULL
 #'   experiment).
 #'
 #' @return p-value according to the null hypothesis that the probability of each
-#'   outcome is the same in every experiment
+#'   outcome is the same in every experiment (two-sided)
 #' @export
 #'
 #' @examples
@@ -367,16 +368,6 @@ lorder <- function(v){
   return(result)
 }
 
-#' Title
-#'
-#' @param v
-#'
-#' @return
-#' @export
-fdebug <- function(v){
-  l <- traverse(list(val=0.04761905, desc=matrix(c(250, 0, 0), byrow = T, ncol = 3), sdesc=c(250, 0, 0)))
-  return(l);
-}
 
 #' @export
 bpval <- function(experiments){
@@ -449,7 +440,7 @@ tbpval <- function(experiments){
   return(v)
 }
 
-#' Two-tail p-val calculation to compare binomial tests
+#' One-sided p-val calculation to compare binomial trials
 #'
 #' This function only takes two experiments with two outcomes, usually called
 #' \emph{sucess} and \emph{failure}. The null hypothesis states that the
@@ -459,13 +450,13 @@ tbpval <- function(experiments){
 #'
 #' @inheritParams bernPval
 #'
-#' @return p-value for the null hypothesis.
+#' @return p-value for the one-sided null hypothesis.
 #' @export
 #'
 #' @examples
-#' # p(success in exp1) > p(success in exp2)
-#' tailed.m.test(list(c(10, 8), c(10, 3)))
-tailed.m.test <- function(experiments){
+#' # H0: p(success in exp1) > p(success in exp2)
+#' os.m.test(list(c(10, 8), c(10, 3)))
+os.m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
   st <- .tzero(mex)
@@ -480,11 +471,11 @@ tailed.m.test <- function(experiments){
   return(result)
 }
 
-#' p-val calculation to compare multinomial tests
+#' p-val calculation to compare multinomial trials
 #'
 #' @inheritParams bernPval
 #'
-#' @return p-value for the null hypothesis (all underlying probabilities
+#' @return p-value for the null hypothesis (all underlying outcome probabilities
 #' are the same in every experiment)
 #' @export
 #'
@@ -537,6 +528,7 @@ modrunif <- function(nc, low, high, dround = 0){
     }
   }
   if (algo == 2){
+    df <- nc - 1
     for (i in 1:n){
       rord <- sample(1:nc, nc, replace = F)
       fst <- rord[1:df]
@@ -555,6 +547,7 @@ modrunif <- function(nc, low, high, dround = 0){
     }
   }
   if (algo == 3){
+    df <- nc - 1
     for (i in 1:n){
       rord <- sample(1:nc, nc, replace = F)
       fst <- rord[1:df]
@@ -601,14 +594,39 @@ modrunif <- function(nc, low, high, dround = 0){
 #'
 #' @inheritParams bernPval
 #' @param n Number of simulations to run
-#' @param algo Algorithm for pseudorandom matrix
+#' @param algo Algorithm for generating the pseudorandom matrix. The two
+#' most relevant algorithms are `4` (two-sided) and `5` (one-sided).
+#' @param NRUNIF number of decimal places in the pseudo-random numbers.
+#' Only for debugging purposes.
 #'
 #' @return List of results, as described in \link{bernDist}
+#' @section Details:
+#' Algorithms `1-4` assume that the probability of each outcome is the same
+#' in every experiment, and therefore the alternative hypothesis
+#' is that at least one of the probabilities is different (either higer or
+#' lower) in at least one experiment. Algorithm `5` only works on `2x2`
+#' tables and assumes that the probability of success in the first experiment
+#' is higher than in the second experiment. Each algorithm divides the interval
+#' `[0, 1]` in as many sub-intervals as outcomes (`nc`), with the first
+#' sub-interval `[0, p_1]` and the last `(p_nc-1, 1]`:
+#' 1. Generate `nc - 1` pseudo-random numbers and divide by their sum. The
+#' resulting values are biased towards `0.5`.
+#' 2. Generate a pseudo-random number `p1` between 0 and 1. Then recursively
+#' generate numbers between `1-sum(p1, p2, ...)` until `nc - 1` numbers have
+#' been provided. Assign every sub-interval to a pseudo-randomly chosen
+#' outcome. The resulting values are biased towards `0` if `nc > 2`.
+#' 3. Like `2`, but the sub-interval that is sub-divided is always the largest
+#' remaining. Less biased than `2` if `nc > 2`.
+#' 4. Generate `nc - 1` pseudo-random numbers in `[0, 1]`, sort them and
+#' use them to divide the interval. This is the default algorithm.
+#' 5. Same as `4`, but one-sided and only for `2x2` tables. The sub-intervals
+#' are generated twice, and the result with a lower probability of success is
+#' assigned to the second experiment.
 #' @export
 #'
 #' @examples
-#' mcm(list(c(4, 5), c(6, 7)), n=1000)
-mcm <- function(experiments=list(), n=10000, algo=1, NRUNIF=0){
+#' mcm(list(c(4, 5), c(6, 7)), n=1000, algo=4)
+mcm <- function(experiments=list(), n=10000, algo=4, NRUNIF=0){
   mex <- .toMatrix(experiments)
   startDesc <- .zero(mex)
   r1 <- list()

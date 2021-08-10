@@ -93,7 +93,7 @@ tm <- mcm(texp, 200000, algo=calgo, NRUNIF = 0)
 tm <- calCumul(tm) 
 tr <- matrix(ncol = 2, nrow = 0)
 for (n in names(tm)){
-  v <- tailed.m.test(t(tm[[n]]$desc))
+  v <- os.m.test(t(tm[[n]]$desc))
   tr <- rbind(tr, c(v,tm[[n]]$cval ))
 }
 colnames(tr) <- c('Theoretical', 'Simulated')
@@ -104,7 +104,7 @@ abline(k, col="black", lty=1)
 legend(legend = c("Regression", "Slope=1"), lty = c(1, 2), col=c('black', 'red'), x='right', y='middle')
 for (n in tolabel){
   if (!is.null(tm[[n]])){
-    v <- tailed.m.test(t(tm[[n]]$desc))
+    v <- os.m.test(t(tm[[n]]$desc))
     x <- v
     y <- tm[[n]]$cval
     t <- tm[[n]]$desc

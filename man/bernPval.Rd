@@ -2,7 +2,8 @@
 % Please edit documentation in R/mtest.R
 \name{bernPval}
 \alias{bernPval}
-\title{p-val calculation to compare mulinomial trials}
+\title{p-val calculation to compare mulinomial trials. This function is R only,
+use \code{m.test} for a faster alternative.}
 \usage{
 bernPval(experiments = list())
 }
@@ -18,10 +19,11 @@ experiment).}
 }
 \value{
 p-value according to the null hypothesis that the probability of each
-outcome is the same in every experiment
+outcome is the same in every experiment (two-sided)
 }
 \description{
-p-val calculation to compare mulinomial trials
+p-val calculation to compare mulinomial trials. This function is R only,
+use \code{m.test} for a faster alternative.
 }
 \examples{
 bernPval(list(c(8, 2), c(4, 7)))
