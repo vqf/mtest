@@ -5,3 +5,5 @@ inst/doc
 .httr-oauth
 .DS_Store
 Figs/*.html
+doc
+Meta
