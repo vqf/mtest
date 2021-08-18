@@ -65,6 +65,11 @@ test_that("Example p-val is correct", {
   expect_equal(pval, 0.01890332, tolerance=1e-6)
 })
 
+test_that("Example one-sided p-val is correct", {
+  expect_equal(os.m.test(list(c(10, 30), c(30, 50))), 0.006068082, tolerance=1e-7)
+})
+
+
 test_that("bernPval gives the same result as bernDist plus calCumul", {
   el <- probeDist(s_4_trials, l4e)
   expect_equal(pval, el$cval, tolerance=1e-6)

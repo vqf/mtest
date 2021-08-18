@@ -73,6 +73,9 @@ double tmtest2(NumericMatrix l, double v, double cutoff, NumericVector nss, Nume
     if (v <= cutoff){
       result += v;
     }
+    else{
+      return result;
+    }
     st(1, 0) = st(1, 0) - 1;
     st(1, 1) = st(1, 1) + 1;
     su(0) = su(0) - 1;
@@ -98,6 +101,9 @@ double tmtest(NumericMatrix l, double v, double cutoff, NumericVector nss, Numer
     v = v + vo / ((double)(ns(0)) + 1);
     if (v <= cutoff){
       result += v;
+    }
+    else{
+      return result;
     }
     st(0, 0) = st(0, 0) + 1;
     st(0, 1) = st(0, 1) - 1;

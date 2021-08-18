@@ -6,7 +6,7 @@ output: html_notebook
 ```{r}
 library(mtest)
 library(Barnard)
-texp <- list(c(1, 5), c(4, 8))
+texp <- list(c(10, 0), c(7, 0))
 nmc <- 200000
 mt <- mcm(texp, nmc, algo=6, NRUNIF = 0)
 mf <- mcm(texp, nmc, algo=4, NRUNIF = 0)

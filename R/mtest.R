@@ -459,6 +459,10 @@ tbpval <- function(experiments){
 os.m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
+  if (cutoff == 0){
+    message(paste('The probability of the result is too low. Probable overflow, ',
+            'the result is unreliable.', sep = ''))
+  }
   st <- .tzero(mex)
   n <- sum(mex)
   denom <- (n + 1) * (n + 2) * binomial.coef(n, st[1, 2])
