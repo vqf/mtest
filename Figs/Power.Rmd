@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 library(mtest)
+library(Barnard)
 texp <- list(c(1, 5), c(4, 8))
 nmc <- 200000
 mt <- mcm(texp, nmc, algo=6, NRUNIF = 0)
@@ -14,6 +15,13 @@ mt <- calCumul(mt)
 tf <- bernDist(texp)
 tf <- calCumul(tf)
 names(tf) <- mapply(function(x){tmp <- paste(as.vector(x$desc), collapse = '_'); names(x) <- tmp}, tf)
+## Add Barnard p-vals
+for (nm in names(tf)){
+  mtx <- tf[[nm]]$desc
+  btest <- Barnard::barnard.test(mtx[1, 1], mtx[2, 1], mtx[1, 2], mtx[2, 2])
+  pval <- as.numeric(btest$p.value[[2]])
+  tf[[nm]]$bpval <- pval
+}
 tr <- matrix(ncol = 2, nrow = 0)
 for (n in names(mf)){
   tr <- rbind(tr, c(tf[[n]]$cval, mf[[n]]$cval ))
@@ -57,28 +65,7 @@ flt <- function(th, sm, alpha, tp){
   return(result)
 }
 
-library(Barnard)
-bnd <- function(th, sm, alpha, tp){
-  result <- 0
-  total <- 0
-  all <- names(sm)
-  for (x in all){
-    success <- F
-    mtx <- th[[x]]$desc
-    btest <- Barnard::barnard.test(mtx[1, 1], mtx[2, 1], mtx[1, 2], mtx[2, 2])
-    pval <- as.numeric(btest$p.value[[2]])
-    if ((tp == 'fp' || tp == 'tp') && pval < a){
-      success <- T
-    }
-    if ((tp == 'fn' || tp == 'tn') && pval >= a){
-      success <- T
-    }
-    if (success == T) result <- result + sm[[x]]$n
-    total <- total + sm[[x]]$n
-  }
-  result <- result / total
-  return(result)
-}
+
 for (a in seq(0, 1, 0.005)){
   fp <- flt(tf, mf, a, 'fp')
   fn <- flt(tf, mt, a, 'fn')
