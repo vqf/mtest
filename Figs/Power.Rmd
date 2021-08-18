@@ -1,0 +1,92 @@
+---
+title: "Power"
+output: html_notebook
+---
+
+```{r}
+library(mtest)
+texp <- list(c(1, 5), c(4, 8))
+nmc <- 200000
+mt <- mcm(texp, nmc, algo=6, NRUNIF = 0)
+mf <- mcm(texp, nmc, algo=4, NRUNIF = 0)
+mf <- calCumul(mf) 
+mt <- calCumul(mt)
+tf <- bernDist(texp)
+tf <- calCumul(tf)
+names(tf) <- mapply(function(x){tmp <- paste(as.vector(x$desc), collapse = '_'); names(x) <- tmp}, tf)
+tr <- matrix(ncol = 2, nrow = 0)
+for (n in names(mf)){
+  tr <- rbind(tr, c(tf[[n]]$cval, mf[[n]]$cval ))
+}
+colnames(tr) <- c('Theoretical', 'Simulated')
+smoothScatter(tr)
+title('2x2 m-test p-value, alternative hypothesis')
+abline(0, 1, col='red', lty=2)
+
+tr <- matrix(ncol = 2, nrow = 0)
+for (n in names(mt)){
+  tr <- rbind(tr, c(tf[[n]]$cval, mt[[n]]$cval ))
+}
+colnames(tr) <- c('Theoretical', 'Simulated')
+smoothScatter(tr)
+title('2x2 m-test p-value, null hypothesis')
+abline(0, 1, col='red', lty=2)
+
+
+```
+
+```{r ROC}
+rtab <- matrix(ncol = 3, nrow = 0)
+btab <- matrix(ncol = 3, nrow = 0)
+flt <- function(th, sm, alpha, tp){
+  result <- 0
+  total <- 0
+  all <- names(sm)
+  for (x in all){
+    success <- F
+    if ((tp == 'fp' || tp == 'tp') && th[[x]]$cval < a){
+      success <- T
+    }
+    if ((tp == 'fn' || tp == 'tn') && th[[x]]$cval >= a){
+      success <- T
+    }
+    if (success == T) result <- result + sm[[x]]$n
+    total <- total + sm[[x]]$n
+  }
+  result <- result / total
+  return(result)
+}
+
+library(Barnard)
+bnd <- function(th, sm, alpha, tp){
+  result <- 0
+  total <- 0
+  all <- names(sm)
+  for (x in all){
+    success <- F
+    mtx <- th[[x]]$desc
+    btest <- Barnard::barnard.test(mtx[1, 1], mtx[2, 1], mtx[1, 2], mtx[2, 2])
+    pval <- as.numeric(btest$p.value[[2]])
+    if ((tp == 'fp' || tp == 'tp') && pval < a){
+      success <- T
+    }
+    if ((tp == 'fn' || tp == 'tn') && pval >= a){
+      success <- T
+    }
+    if (success == T) result <- result + sm[[x]]$n
+    total <- total + sm[[x]]$n
+  }
+  result <- result / total
+  return(result)
+}
+for (a in seq(0, 1, 0.005)){
+  fp <- flt(tf, mf, a, 'fp')
+  fn <- flt(tf, mt, a, 'fn')
+  tp <- flt(tf, mt, a, 'tp')
+  rtab <- rbind(rtab, c(a, fp, tp))
+  bfp
+}
+par(pin=c(3.8, 3.8))
+plot(rtab[,2], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l')
+lines()
+```

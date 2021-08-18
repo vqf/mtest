@@ -586,6 +586,15 @@ modrunif <- function(nc, low, high, dround = 0){
       }
     }
   }
+  if (algo == 6){
+    for (i in 1:n){
+      rord <- c(rep(modrunif(nr, 0, 1, NRUNIF)), 1)
+      r2 <- rord
+      for (j in 1:nr){
+        result[nr * (i-1) + j, ] <- c(r2[j], 1-r2[j])
+      }
+    }
+  }
   return(result)
 }
 
@@ -622,6 +631,7 @@ modrunif <- function(nc, low, high, dround = 0){
 #' 5. Same as `4`, but one-sided and only for `2x2` tables. The sub-intervals
 #' are generated twice, and the result with a lower probability of success is
 #' assigned to the second experiment.
+#' 6. Same as `5`, but results are not sorted.
 #' @export
 #'
 #' @examples

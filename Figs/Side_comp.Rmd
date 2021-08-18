@@ -1,0 +1,46 @@
+---
+title: "Side comparison"
+output: html_notebook
+---
+
+How many combinations are significantly different in a one-sided comparison 
+and not in a two-sided comparison?
+
+```{r}
+library(mtest)
+ex <- list(c(100, 0), c(80, 0))
+f <- bernDist(ex)
+f <- calCumul(f)
+r <- matrix(ncol = 2, nrow = 0)
+lim <- 0.05
+tolabel <- matrix(ncol = 6, nrow = 0)
+under <- 0
+for (n in f){
+  s <- os.m.test(t(n$desc))
+  r <- rbind(r, c(s, n$cval))
+  if (s < lim){
+    under <- under + 1
+    if (n$cval > lim){
+      tolabel <- rbind(tolabel, c(s, n$cval, n$desc[1, 1], n$desc[2, 1], n$desc[1, 2], n$desc[2, 2]))
+    }
+  }
+}
+smoothScatter(r)
+title('Comparison between one-sided and two-sided')
+txt <- paste(nrow(tolabel), '/', under, '\n', round(100 * nrow(tolabel)/under, 2), '%')
+legend(legend = c(txt), pch=2, col=c('black'), x='right', y='middle')
+for (i in tolabel){
+  n <- tolabel[i,]
+  v <- n[1]
+  x <- v
+  y <- n[2]
+  l <- paste(n[3], ' ', n[4], '\n', n[5], ' ', n[6], sep = '')
+  points(x, y, pch = 2)
+  #text(x, y, l)
+}
+```
+```{r points}
+t <- r
+lim <- 0.05
+t[t[,1] < lim & t[,2] > lim,]
+```
