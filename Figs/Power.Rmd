@@ -19,8 +19,10 @@ names(tf) <- mapply(function(x){tmp <- paste(as.vector(x$desc), collapse = '_');
 for (nm in names(tf)){
   mtx <- tf[[nm]]$desc
   btest <- Barnard::barnard.test(mtx[1, 1], mtx[2, 1], mtx[1, 2], mtx[2, 2])
+  ftest <- as.numeric(fisher.test(mtx)$p.value)
   pval <- as.numeric(btest$p.value[[2]])
   tf[[nm]]$bpval <- pval
+  tf[[nm]]$fpval <- ftest
 }
 tr <- matrix(ncol = 2, nrow = 0)
 for (n in names(mf)){
@@ -44,18 +46,18 @@ abline(0, 1, col='red', lty=2)
 ```
 
 ```{r ROC}
-rtab <- matrix(ncol = 3, nrow = 0)
-btab <- matrix(ncol = 3, nrow = 0)
-flt <- function(th, sm, alpha, tp){
+rtab <- matrix(ncol = 7, nrow = 0)
+flt <- function(th, sm, alpha, tp, entry="cval"){
   result <- 0
   total <- 0
   all <- names(sm)
   for (x in all){
     success <- F
-    if ((tp == 'fp' || tp == 'tp') && th[[x]]$cval < a){
+    val <- as.numeric(th[[x]][entry])
+    if ((tp == 'fp' || tp == 'tp') && val < a){
       success <- T
     }
-    if ((tp == 'fn' || tp == 'tn') && th[[x]]$cval >= a){
+    if ((tp == 'fn' || tp == 'tn') && val >= a){
       success <- T
     }
     if (success == T) result <- result + sm[[x]]$n
@@ -65,15 +67,30 @@ flt <- function(th, sm, alpha, tp){
   return(result)
 }
 
-
+colnames(rtab) <- c('alpha', 'fp_mtest', 'tp_mtest', 
+                    'fp_barnard', 'tp_barnard',
+                    'fp_fisher', 'tp_fisher')
 for (a in seq(0, 1, 0.005)){
-  fp <- flt(tf, mf, a, 'fp')
-  fn <- flt(tf, mt, a, 'fn')
-  tp <- flt(tf, mt, a, 'tp')
-  rtab <- rbind(rtab, c(a, fp, tp))
-  bfp
+  mfp <- flt(tf, mf, a, 'fp')
+  mtp <- flt(tf, mt, a, 'tp')
+  bfp <- flt(tf, mf, a, 'fp', 'bpval')
+  btp <- flt(tf, mt, a, 'tp', 'bpval')
+  ffp <- flt(tf, mf, a, 'fp', 'fpval')
+  ftp <- flt(tf, mt, a, 'tp', 'fpval')
+  
+  rtab <- rbind(rtab, c(a, mfp, mtp, bfp, btp, ffp, ftp))
+
 }
-par(pin=c(3.8, 3.8))
-plot(rtab[,2], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l')
-lines()
+par(pin=c(3, 3))
+plot(rtab[,2], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'FPR', ylab='TPR', col="black")
+title('ROC')
+lines(rtab[,4], rtab[,5], lty=2, col="red")
+lines(rtab[,6], rtab[,7], lty=3, col="blue")
+legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+plot(rtab[,1], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'alpha', ylab='TPR', col="black")
+title('Power')
+lines(rtab[,1], rtab[,5], lty=2, col="red")
+lines(rtab[,1], rtab[,7], lty=3, col="blue")
+legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+
 ```
