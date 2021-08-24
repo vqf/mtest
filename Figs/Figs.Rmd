@@ -8,6 +8,8 @@ with 2 experiments of 10 and 7 trials.
 ```{r}
 library(mtest)
 library(plot3D)
+MAKEPDF <- F
+PDFPATH <- 'D:\\Math\\Bernouilli\\pnas_template\\fig1.pdf'
 n1 <- 10
 n2 <- 7
 s1 <- seq(0, n1, length=(n1+1))
@@ -24,7 +26,18 @@ for (x in s1){
 
 plot3D::persp3D(z=z, x=s1, y=s2, theta = 155, phi = 35, ticktype='detailed', bty='b2', xlab='s1', ylab='s2', zlab='\n\nP')
 plot3D::persp3D(z=z2, x=s1, y=s2, theta = 145, phi = 35, ticktype='detailed', bty='b2', xlab='s1', ylab='s2', zlab='\n\nP')
-#persp(s1, s2, z, theta = 135, phi = 35, ticktype = 'detailed', col = colset(z, c(0, 0, 1), c(1, 0, 0)))
+
+if (MAKEPDF == T){
+  pdf(PDFPATH, width = 8, height = 4)
+  par(mfrow=c(1, 2), pty="s", oma=c(0, 1, 0, 1), pin=c(2.8, 2.8))
+  plot3D::persp3D(z=z, x=s1, y=s2, theta = 155, phi = 35, ticktype='detailed', bty='b2', xlab='\n\ns1', ylab='\n\ns2', zlab='\n\n\nP')
+  #mtext('A', adj = 0, cex=2)
+  par(pin=c(2.8, 2.8))
+  plot3D::persp3D(z=z2, x=s1, y=s2, theta = 145, phi = 35, ticktype='detailed', bty='b2', xlab='\n\ns1', ylab='\n\ns2', zlab='\n\n\nP')
+  #mtext('B', adj = 0, cex=2)
+  dev.off()
+  #persp(s1, s2, z, theta = 135, phi = 35, ticktype = 'detailed', col = colset(z, c(0, 0, 1), c(1, 0, 0)))
+}
 ```
 
 ```{r}

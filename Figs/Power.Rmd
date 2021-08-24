@@ -6,10 +6,12 @@ output: html_notebook
 ```{r}
 library(mtest)
 library(Barnard)
+MAKEPDF <- F
+PDFPATH <- 'D:\\Math\\Bernouilli\\pnas_template\\fig2.pdf'
 texp <- list(c(10, 0), c(7, 0))
 nmc <- 200000
-mt <- mcm(texp, nmc, algo=6, NRUNIF = 0)
-mf <- mcm(texp, nmc, algo=4, NRUNIF = 0)
+mt <- mcm(texp, nmc, algo=6, NRUNIF = 0) #Alternative model, positives are true
+mf <- mcm(texp, nmc, algo=4, NRUNIF = 0) #Null model, positives are false
 mf <- calCumul(mf) 
 mt <- calCumul(mt)
 tf <- bernDist(texp)
@@ -30,7 +32,7 @@ for (n in names(mf)){
 }
 colnames(tr) <- c('Theoretical', 'Simulated')
 smoothScatter(tr)
-title('2x2 m-test p-value, alternative hypothesis')
+title('2x2 m-test p-value, null hypothesis')
 abline(0, 1, col='red', lty=2)
 
 tr <- matrix(ncol = 2, nrow = 0)
@@ -39,7 +41,7 @@ for (n in names(mt)){
 }
 colnames(tr) <- c('Theoretical', 'Simulated')
 smoothScatter(tr)
-title('2x2 m-test p-value, null hypothesis')
+title('2x2 m-test p-value, alternative hypothesis')
 abline(0, 1, col='red', lty=2)
 
 
@@ -93,4 +95,20 @@ lines(rtab[,1], rtab[,5], lty=2, col="red")
 lines(rtab[,1], rtab[,7], lty=3, col="blue")
 legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
 
+if (MAKEPDF == T){
+  pdf(PDFPATH, width = 9, height = 5)
+  par(mfrow=c(1, 2), pty="s", oma=c(0, 1.1, 0, 1), pin=c(2.5, 2.5))
+  plot(rtab[,2], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'FPR', ylab='TPR', col="black")
+  title('ROC')
+  lines(rtab[,4], rtab[,5], lty=2, col="red")
+  lines(rtab[,6], rtab[,7], lty=3, col="blue")
+  legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+  par(pin=c(2.5, 2.5))
+  plot(rtab[,1], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'alpha', ylab='TPR', col="black")
+  title('Power')
+  lines(rtab[,1], rtab[,5], lty=2, col="red")
+  lines(rtab[,1], rtab[,7], lty=3, col="blue")
+  legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+  dev.off()
+}
 ```

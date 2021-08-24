@@ -99,10 +99,7 @@ the placebo group. Setting a limit p-val of 0.05,
 os.m.test(list(c(15, 11), c(41, 8)))
 ```
 
-Therefore, we can reject the null hypothesis. For stronger evidence, we can 
-also use `m.test` to reject the null hypothesis that both probabilities are 
-equal and accept the alternative hypothesis that the probability of success 
-is higher in the `Surgery` group.
+Therefore, we can reject the null hypothesis.
 
 ## Example 3 - multinomial test
 We can also analyze larger contingency tables, although the computational 
