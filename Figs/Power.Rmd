@@ -88,12 +88,12 @@ plot(rtab[,2], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'FPR', ylab=
 title('ROC')
 lines(rtab[,4], rtab[,5], lty=2, col="red")
 lines(rtab[,6], rtab[,7], lty=3, col="blue")
-legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 2), col=c('black', 'red', 'blue'), x='right', y='middle')
 plot(rtab[,1], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'alpha', ylab='TPR', col="black")
 title('Power')
 lines(rtab[,1], rtab[,5], lty=2, col="red")
 lines(rtab[,1], rtab[,7], lty=3, col="blue")
-legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 2), col=c('black', 'red', 'blue'), x='right', y='middle')
 
 if (MAKEPDF == T){
   pdf(PDFPATH, width = 9, height = 5)
@@ -101,14 +101,14 @@ if (MAKEPDF == T){
   plot(rtab[,2], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'FPR', ylab='TPR', col="black")
   title('ROC')
   lines(rtab[,4], rtab[,5], lty=2, col="red")
-  lines(rtab[,6], rtab[,7], lty=3, col="blue")
-  legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+  lines(rtab[,6], rtab[,7], lty=2, col="blue")
+  legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 2), col=c('black', 'red', 'blue'), x='right', y='middle')
   par(pin=c(2.5, 2.5))
   plot(rtab[,1], rtab[,3], xlim=c(0,1), ylim=c(0,1), type='l', xlab = 'alpha', ylab='TPR', col="black")
   title('Power')
   lines(rtab[,1], rtab[,5], lty=2, col="red")
-  lines(rtab[,1], rtab[,7], lty=3, col="blue")
-  legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 3), col=c('black', 'red', 'blue'), x='right', y='middle')
+  lines(rtab[,1], rtab[,7], lty=2, col="blue")
+  legend(legend = c("m-test", "Barnard", "Fisher"), lty = c(1, 2, 2), col=c('black', 'red', 'blue'), x='right', y='middle')
   dev.off()
 }
 ```
