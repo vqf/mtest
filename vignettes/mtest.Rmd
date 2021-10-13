@@ -85,7 +85,7 @@ which an incision was made but nothing else.
 substantial reduction in migraine headaches," which we will
 label as success.
 
-Therefore, the null hypothesis is that the probability of success is higher in 
+The null hypothesis is that the probability of success is higher in 
 the placebo group. Setting a limit p-val of 0.05,
 
 
@@ -99,7 +99,17 @@ the placebo group. Setting a limit p-val of 0.05,
 os.m.test(list(c(15, 11), c(41, 8)))
 ```
 
-Therefore, we can reject the null hypothesis.
+Therefore, we can reject the null hypothesis. Notice that this test does not 
+take into account the possibility that the probability is the same. You may also 
+want to run a two-sided test to see if you can reject that hypothesis. With 
+the same p-val limit of 0.05,
+
+```{r non-tailed-II}
+m.test(list(c(15, 11), c(41, 8)))
+```
+
+And we conclude that the probability of success in the surgery group is higher
+than in the placebo group.
 
 ## Example 3 - multinomial test
 We can also analyze larger contingency tables, although the computational 

@@ -8,8 +8,8 @@ with 2 experiments of 10 and 7 trials.
 ```{r}
 library(mtest)
 library(plot3D)
-MAKEPDF <- F
-PDFPATH <- 'D:\\Math\\Bernouilli\\pnas_template\\fig1.pdf'
+MAKEPDF <- T
+PDFPATH <- 'D:/Math/Bernouilli/ms/vtex-soft-texsupport.ims-aos-07708a9/vtex-soft-texsupport.ims-aos-07708a9/fig1.pdf'
 n1 <- 10
 n2 <- 7
 s1 <- seq(0, n1, length=(n1+1))
@@ -55,6 +55,6 @@ for (x in s1){
   }
 }
 
-plot3D::persp3D(z=z, x=s1, y=s2, theta = 155, phi = 35, ticktype='detailed', bty='b2', xlab='s1', ylab='s2', zlab='\n\nP')
-plot3D::persp3D(z=z2, x=s1, y=s2, theta = 145, phi = 35, ticktype='detailed', bty='b2', xlab='s1', ylab='s2', zlab='\n\nP')
+plot3D::persp3D(z=z, x=s1, y=s2, theta = 155, phi = 35, ticktype='detailed', bty='b2', xlab='s1', ylab='s2', zlab='\n\nPval')
+plot3D::persp3D(z=z2, x=s1, y=s2, theta = 145, phi = 35, ticktype='detailed', bty='b2', xlab='s1', ylab='s2', zlab='\n\nPval')
 ```

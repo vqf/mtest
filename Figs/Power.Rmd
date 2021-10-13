@@ -6,8 +6,8 @@ output: html_notebook
 ```{r}
 library(mtest)
 library(Barnard)
-MAKEPDF <- F
-PDFPATH <- 'D:\\Math\\Bernouilli\\pnas_template\\fig2.pdf'
+MAKEPDF <- T
+PDFPATH <- 'D:/Math/Bernouilli/ms/vtex-soft-texsupport.ims-aos-07708a9/vtex-soft-texsupport.ims-aos-07708a9/fig2.pdf'
 texp <- list(c(10, 0), c(7, 0))
 nmc <- 200000
 mt <- mcm(texp, nmc, algo=6, NRUNIF = 0) #Alternative model, positives are true
