@@ -6,6 +6,7 @@ output: html_notebook
 ```{r}
 library(mtest)
 library(Barnard)
+set.seed(42)
 MAKEPDF <- T
 PDFPATH <- 'D:/Math/Bernouilli/ms/vtex-soft-texsupport.ims-aos-07708a9/vtex-soft-texsupport.ims-aos-07708a9/fig2.pdf'
 texp <- list(c(10, 0), c(7, 0))
