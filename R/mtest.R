@@ -488,6 +488,10 @@ os.m.test <- function(experiments){
 m.test <- function(experiments, null.hypothesis="equal"){
   mex <- .toMatrix(experiments)
   cutoff <- bpval(experiments)
+  if (cutoff == 0){
+    message(paste('The probability of the result is too low. Probable overflow, ',
+                  'the result is unreliable.', sep = ''))
+  }
   df <- ncol(mex) - 1
   nr <- nrow(mex)
   st <- .zero(mex)

@@ -4,7 +4,6 @@ inst/doc
 .Rdata
 .httr-oauth
 .DS_Store
-Figs/*.html
 doc
 Meta
 *.pdf
