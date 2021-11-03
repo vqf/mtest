@@ -4,7 +4,7 @@
 \alias{m.test}
 \title{p-val calculation to compare multinomial trials}
 \usage{
-m.test(experiments, null.hypothesis = "equal")
+m.test(experiments)
 }
 \arguments{
 \item{experiments}{List of multinomial trials. Each

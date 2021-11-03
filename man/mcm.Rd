@@ -54,6 +54,7 @@ use them to divide the interval. This is the default algorithm.
 \item Same as \code{4}, but one-sided and only for \verb{2x2} tables. The sub-intervals
 are generated twice, and the result with a lower probability of success is
 assigned to the second experiment.
+\item Same as \code{5}, but results are not sorted.
 }
 }
 

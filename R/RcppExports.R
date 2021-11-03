@@ -17,3 +17,11 @@ mtest <- function(l, cutoff, rw = 1L, cl = 1L) {
     .Call('_mtest_mtest', PACKAGE = 'mtest', l, cutoff, rw, cl)
 }
 
+sumlog <- function(n1, n2) {
+    .Call('_mtest_sumlog', PACKAGE = 'mtest', n1, n2)
+}
+
+lmtest <- function(l, cutoff, rw = 1L, cl = 1L) {
+    .Call('_mtest_lmtest', PACKAGE = 'mtest', l, cutoff, rw, cl)
+}
+

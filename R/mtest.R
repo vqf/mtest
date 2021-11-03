@@ -392,6 +392,30 @@ bpval <- function(experiments){
   return(v)
 }
 
+#' @export
+lbpval <- function(experiments){
+  mex <- .toMatrix(experiments)
+  df <- ncol(mex) - 1
+  st <- .zero(mex)
+  n <- sum(mex)
+  denom <- sum(log((unlist(Map({function(x) n + x}, c(1:df))))))
+  v <- sum(log(1:df)) - denom
+  su <- colSums(st)
+  for (i in 1:nrow(mex)){
+    for (j in 2:ncol(mex)){
+      while (st[i, j] < mex[i, j]){
+        v <- v + log(st[i, 1]) + log(1 + su[j]) - log((1 + st[i, j])) -log(su[1])
+        st[i, 1] <- st[i, 1] - 1
+        st[i, j] <- st[i, j] + 1
+        su[1] <- su[1] - 1
+        su[j] <- su[j] + 1
+      }
+    }
+  }
+  return(v)
+}
+
+
 binomial.coef <- function(n, k){
   result <- 1
   for (i in 1:k){
@@ -475,6 +499,33 @@ os.m.test <- function(experiments){
   return(result)
 }
 
+#' @export
+lm.test <- function(experiments){
+  mex <- .toMatrix(experiments)
+  cutoff <- lbpval(experiments)
+  df <- ncol(mex) - 1
+  nr <- nrow(mex)
+  st <- .zero(mex)
+  su <- colSums(st)
+  n <- sum(mex)
+  denom <- sum(log(unlist(Map({function(x) n + x}, c(1:df)))))
+  v <- sum(log(1:df)) - denom
+  r <- 0
+  if (v <= cutoff){
+    r <- v
+  }
+  result <- lmtest(list(val=v, desc=st, sdesc=su, r=0), cutoff, 0, 0)
+  r <- sumlog(r, result$r)
+  if (nr > 1){
+    for (rw in 2:nr){
+      t <- lmtest(list(val=v, desc=st, sdesc=su, r=0), cutoff,
+                 rw - 1, 0)
+      r <- sumlog(r, t$r)
+    }
+  }
+  return(r)
+}
+
 #' p-val calculation to compare multinomial trials
 #'
 #' @inheritParams bernPval
@@ -485,12 +536,13 @@ os.m.test <- function(experiments){
 #'
 #' @examples
 #' m.test(list(c(8, 2), c(4, 7)))
-m.test <- function(experiments, null.hypothesis="equal"){
+m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- bpval(experiments)
   if (cutoff == 0){
-    message(paste('The probability of the result is too low. Probable overflow, ',
-                  'the result is unreliable.', sep = ''))
+    #message(paste('The probability of the result is too low. Probable overflow, ',
+    #              'the result is unreliable.', sep = ''))
+    return(lm.test(experiments))
   }
   df <- ncol(mex) - 1
   nr <- nrow(mex)

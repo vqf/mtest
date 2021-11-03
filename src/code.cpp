@@ -187,4 +187,98 @@ List mtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
   return(result);
 }
 
+// [[Rcpp::export]]
+double sumlog(double n1, double n2){
+  if (n1 == n2){
+    return n1 + log(2);
+  }
+  double l = (n1 > n2) ? n1 : n2;
+  double s = (n1 > n2) ? n2 : n1;
+  double result = l;
+  double Q = s - l;
+  double q = exp(Q);
+  double qq = q * q;
+  double c = 1 - q;
+  uint32_t i = 1;
+  double k = q;
+  double next = q * (1-q/2);
+  while (abs(next) > 1e-20){
+    i = i + 2;
+    result += next;
+    k *= qq;
+    next = k*((1 + i * c)/(i*(i + 1)));
+  }
+  return result;
+}
+
+// [[Rcpp::export]]
+List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
+  double v = l["val"];
+  NumericMatrix dm = l["desc"];
+  NumericVector ds = l["sdesc"];
+  NumericMatrix m = Rcpp::clone(dm);
+  NumericVector s = Rcpp::clone(ds);
+  uint8_t nc = m.ncol();
+  uint8_t nr = m.nrow();
+  if (m(rw, cl) < 0 || s(cl) < 0){
+    stop("Value lower than zero");
+  }
+  m(rw, cl + 1) = m(rw, cl + 1) + 1;
+  s(cl + 1) = s(cl + 1) + 1;
+  double newv = log(v) + log(m(rw, cl)) + log(s(cl + 1)) - log(m(rw, cl + 1)) - log(s(cl));
+  m(rw, cl) = m(rw, cl) - 1;
+  s(cl) = s(cl) - 1;
+  //Rprintf("%f\n", newv);
+  //Rf_PrintValue(m);
+  List result = List::create( _["val"] = newv,
+                              _["desc"] = m,
+                              _["sdesc"] = s,
+                              _["r"] = 0
+  );
+  double r = 0;
+  if (newv <= cutoff){
+    r = newv;
+  }
+  if (rw < (nr-1)){
+    uint8_t i = 0;
+    for (i = (rw + 1); i < nr; i++){
+      //Rprintf("a: %u\n", i);
+      //Rf_PrintValue(m);
+      List tr = lmtest(List::create(_["val"] = newv,
+                                   _["desc"] = m,
+                                   _["sdesc"] = s,
+                                   _["r"] = r),
+                                   cutoff,
+                                   i, 0);
+      double newr = tr["r"];
+      r = sumlog(r, newr);
+    }
+  }
+  if (m(rw, cl) > 0){
+    //Rprintf("b: %u\n", m(rw, cl));
+    //Rf_PrintValue(m);
+    List tr = lmtest(List::create(_["val"] = newv,
+                                 _["desc"] = m,
+                                 _["sdesc"] = s,
+                                 _["r"] = r),
+                                 cutoff,
+                                 rw, cl);
+    double newr = tr["r"];
+    r = sumlog(r, newr);
+  }
+  if (cl < (uint8_t)(nc-2)){
+    //Rprintf("c: %u\n", cl);
+    //Rf_PrintValue(m);
+    List tr = lmtest(List::create(_["val"] = newv,
+                                 _["desc"] = m,
+                                 _["sdesc"] = s,
+                                 _["r"] = r),
+                                 cutoff,
+                                 rw, cl + 1);
+    double newr = tr["r"];
+    r = sumlog(r, newr);
+  }
+  result["r"] = r;
+  return(result);
+}
 
