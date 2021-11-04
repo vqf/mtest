@@ -515,12 +515,26 @@ lm.test <- function(experiments){
     r <- v
   }
   result <- lmtest(list(val=v, desc=st, sdesc=su, r=0), cutoff, 0, 0)
-  r <- sumlog(r, result$r)
+  if (r == 0){
+    r <- result$r;
+  }
+  else{
+    if (result$r != 0){
+      r <- sumlog(r, result$r)
+    }
+  }
   if (nr > 1){
     for (rw in 2:nr){
       t <- lmtest(list(val=v, desc=st, sdesc=su, r=0), cutoff,
                  rw - 1, 0)
-      r <- sumlog(r, t$r)
+      if (r == 0){
+        r <- t$r;
+      }
+      else{
+        if (result$r != 0){
+          r <- sumlog(r, t$r)
+        }
+      }
     }
   }
   return(r)
@@ -540,9 +554,9 @@ m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- bpval(experiments)
   if (cutoff == 0){
-    #message(paste('The probability of the result is too low. Probable overflow, ',
-    #              'the result is unreliable.', sep = ''))
-    return(lm.test(experiments))
+    message(paste('The probability of the result is too low. Probable overflow. ',
+                  'Trying with alternative algorithm.', sep = ''))
+    return(exp(lm.test(experiments)))
   }
   df <- ncol(mex) - 1
   nr <- nrow(mex)

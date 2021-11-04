@@ -225,10 +225,11 @@ List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
   }
   m(rw, cl + 1) = m(rw, cl + 1) + 1;
   s(cl + 1) = s(cl + 1) + 1;
-  double newv = log(v) + log(m(rw, cl)) + log(s(cl + 1)) - log(m(rw, cl + 1)) - log(s(cl));
+  double newv = v + log(m(rw, cl)) + log(s(cl + 1)) - log(m(rw, cl + 1)) - log(s(cl));
   m(rw, cl) = m(rw, cl) - 1;
   s(cl) = s(cl) - 1;
-  //Rprintf("%f\n", newv);
+  //Rprintf("%f\t%f\n", v, newv);
+  //stop("");
   //Rf_PrintValue(m);
   List result = List::create( _["val"] = newv,
                               _["desc"] = m,
@@ -251,7 +252,14 @@ List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
                                    cutoff,
                                    i, 0);
       double newr = tr["r"];
-      r = sumlog(r, newr);
+      if (r == 0){
+        r = newr;
+      }
+      else{
+        if (newr != 0){
+          r = sumlog(r, newr);
+        }
+      }
     }
   }
   if (m(rw, cl) > 0){
@@ -264,7 +272,14 @@ List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
                                  cutoff,
                                  rw, cl);
     double newr = tr["r"];
-    r = sumlog(r, newr);
+    if (r == 0){
+      r = newr;
+    }
+    else{
+      if (newr != 0){
+        r = sumlog(r, newr);
+      }
+    }
   }
   if (cl < (uint8_t)(nc-2)){
     //Rprintf("c: %u\n", cl);
@@ -276,7 +291,14 @@ List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
                                  cutoff,
                                  rw, cl + 1);
     double newr = tr["r"];
-    r = sumlog(r, newr);
+    if (r == 0){
+      r = newr;
+    }
+    else{
+      if (newr != 0){
+        r = sumlog(r, newr);
+      }
+    }
   }
   result["r"] = r;
   return(result);
