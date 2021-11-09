@@ -11,6 +11,12 @@ possible values.
 
 ## Installation
 
+You can use `devtools` to install from this repository:
+
+``` r
+install_github('vqf/mtest', build_vignettes = T)
+```
+
 You will be able to install the released version of mtest shortly from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
