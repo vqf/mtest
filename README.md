@@ -11,7 +11,7 @@ possible values.
 
 ## Installation
 
-You can install the released version of mtest from [CRAN](https://CRAN.R-project.org) with:
+You will be able to install the released version of mtest shortly from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("mtest")
