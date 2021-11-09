@@ -542,8 +542,8 @@ os.m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
   if (cutoff == 0){
-    message(paste('The probability of the result is too low. Probable underflow. ',
-            'Trying with modified algorithm.', sep = ''))
+    #message(paste('The probability of the result is too low. Probable underflow. ',
+    #        'Trying with modified algorithm.', sep = ''))
     return(exp(los.m.test(experiments)))
 
   }
@@ -611,8 +611,8 @@ m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- bpval(experiments)
   if (cutoff == 0){
-    message(paste('The probability of the result is too low. Probable overflow. ',
-                  'Trying with alternative algorithm.', sep = ''))
+    #message(paste('The probability of the result is too low. Probable overflow. ',
+    #              'Trying with alternative algorithm.', sep = ''))
     return(exp(lm.test(experiments)))
   }
   df <- ncol(mex) - 1
