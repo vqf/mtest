@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// sumlog
+double sumlog(double n1, double n2);
+RcppExport SEXP _mtest_sumlog(SEXP n1SEXP, SEXP n2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type n1(n1SEXP);
+    Rcpp::traits::input_parameter< double >::type n2(n2SEXP);
+    rcpp_result_gen = Rcpp::wrap(sumlog(n1, n2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // traverse
 List traverse(List l);
 RcppExport SEXP _mtest_traverse(SEXP lSEXP) {
@@ -24,6 +36,22 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type from(fromSEXP);
     rcpp_result_gen = Rcpp::wrap(sl(from));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ltmtest
+double ltmtest(NumericMatrix l, double v, double cutoff, NumericVector nss, NumericVector sus, double vo);
+RcppExport SEXP _mtest_ltmtest(SEXP lSEXP, SEXP vSEXP, SEXP cutoffSEXP, SEXP nssSEXP, SEXP susSEXP, SEXP voSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type l(lSEXP);
+    Rcpp::traits::input_parameter< double >::type v(vSEXP);
+    Rcpp::traits::input_parameter< double >::type cutoff(cutoffSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nss(nssSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sus(susSEXP);
+    Rcpp::traits::input_parameter< double >::type vo(voSEXP);
+    rcpp_result_gen = Rcpp::wrap(ltmtest(l, v, cutoff, nss, sus, vo));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -57,18 +85,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sumlog
-double sumlog(double n1, double n2);
-RcppExport SEXP _mtest_sumlog(SEXP n1SEXP, SEXP n2SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type n1(n1SEXP);
-    Rcpp::traits::input_parameter< double >::type n2(n2SEXP);
-    rcpp_result_gen = Rcpp::wrap(sumlog(n1, n2));
-    return rcpp_result_gen;
-END_RCPP
-}
 // lmtest
 List lmtest(List l, double cutoff, uint8_t rw, uint8_t cl);
 RcppExport SEXP _mtest_lmtest(SEXP lSEXP, SEXP cutoffSEXP, SEXP rwSEXP, SEXP clSEXP) {
@@ -85,11 +101,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_mtest_sumlog", (DL_FUNC) &_mtest_sumlog, 2},
     {"_mtest_traverse", (DL_FUNC) &_mtest_traverse, 1},
     {"_mtest_sl", (DL_FUNC) &_mtest_sl, 1},
+    {"_mtest_ltmtest", (DL_FUNC) &_mtest_ltmtest, 6},
     {"_mtest_tmtest", (DL_FUNC) &_mtest_tmtest, 6},
     {"_mtest_mtest", (DL_FUNC) &_mtest_mtest, 4},
-    {"_mtest_sumlog", (DL_FUNC) &_mtest_sumlog, 2},
     {"_mtest_lmtest", (DL_FUNC) &_mtest_lmtest, 4},
     {NULL, NULL, 0}
 };

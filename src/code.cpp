@@ -3,6 +3,46 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
+double sumlog(double n1, double n2){
+  double l = (n1 > n2) ? n1 : n2;
+  double s = (n1 > n2) ? n2 : n1;
+  if ((l - s) < 1e-2){
+    double x = l-s;
+    double prec = 1e-20;
+    double prev = x / 2;
+    double r = s + log(2) + prev;
+    uint32_t i = 1;
+    while(prev > prec){
+      prev *= -x / 2;
+      r += prev / (i+1);
+      i++;
+    }
+    return r;
+  }
+  double result = l;
+  double Q = s - l;
+  double q = exp(Q);
+  double qq = q * q;
+  double c = 1 - q;
+  uint32_t i = 1;
+  double k = q;
+  double next = q * (1-q/2);
+  uint32_t counter = 0;
+  while (abs(next) > 1e-20){
+    i = i + 2;
+    result += next;
+    k *= qq;
+    next = k*((1 + i * c)/(i*(i + 1)));
+    counter++;
+    if (counter > 10000){
+      stop("%f\t%f\t%f\n", n1, n2, next);
+    }
+  }
+  return result;
+}
+
+
+// [[Rcpp::export]]
 List traverse(List l) {
   NumericVector desc = as<NumericVector>(l["desc"]);
   NumericVector sdesc = l["sdesc"];
@@ -61,6 +101,62 @@ NumericMatrix sl(NumericMatrix from) {
   return t;
 }
 
+double ltmtest2(NumericMatrix l, double v, double cutoff, NumericVector nss, NumericVector sus, double vo){
+  double result = -500000;
+  NumericMatrix st = Rcpp::clone(l);
+  NumericVector ns = Rcpp::clone(nss);
+  NumericVector su = Rcpp::clone(sus);
+  uint32_t nd2 = st(1, 0);
+  vo = vo + log(ns(1) + 1) + log(st(0, 0) + 1) + log(su(1) + 1) - log(ns(0) + 1) - log(st(1, 1) + 1) - log(su(0) + 1);
+  uint32_t i = 0;
+  while (st(1, 1) < nd2){
+    v = sumlog(v, vo - log(ns(1) + 1));
+    if (v <= cutoff){
+      result = sumlog(v, result);
+    }
+    else{
+      return result;
+    }
+    st(1, 0) = st(1, 0) - 1;
+    st(1, 1) = st(1, 1) + 1;
+    su(0) = su(0) - 1;
+    su(1) = su(1) + 1;
+    vo = vo + log(st(1, 0)+1) + log(1 + su(1)) - log(st(1, 1) + 1) - log(su(0)+1);
+  }
+  return result;
+}
+
+
+// [[Rcpp::export]]
+double ltmtest(NumericMatrix l, double v, double cutoff, NumericVector nss, NumericVector sus, double vo){
+  double result = -500000;
+  if (v <= cutoff){
+    result = sumlog(v, result);
+  }
+  NumericMatrix st = Rcpp::clone(l);
+  NumericVector ns = Rcpp::clone(nss);
+  NumericVector su = Rcpp::clone(sus);
+  result = sumlog(result, ltmtest2(st, v, cutoff, ns, su, vo));
+  uint32_t nd1 = (uint32_t) ns(0);
+  uint32_t i = 0;
+  while (st(0, 0) < nd1){
+    v = sumlog(v, vo - log((double)(ns(0)) + 1));
+    if (v <= cutoff){
+      result = sumlog(v, result);
+    }
+    else{
+      return result;
+    }
+    st(0, 0) = st(0, 0) + 1;
+    st(0, 1) = st(0, 1) - 1;
+    su(0) = su(0) + 1;
+    su(1) = su(1) - 1;
+    vo = vo + log((double)(st(0, 1))+1) + log(1 + (double)(su(0))) - log(1 + (double)(st(0, 0))) - log((double)(su(1))+1);
+    result = sumlog(result, ltmtest2(st, v, cutoff, ns, su, vo));
+  }
+  return result;
+}
+
 double tmtest2(NumericMatrix l, double v, double cutoff, NumericVector nss, NumericVector sus, double vo){
   double result = 0;
   NumericMatrix st = Rcpp::clone(l);
@@ -68,7 +164,7 @@ double tmtest2(NumericMatrix l, double v, double cutoff, NumericVector nss, Nume
   NumericVector su = Rcpp::clone(sus);
   uint32_t nd2 = st(1, 0);
   vo = vo * ((ns(1) + 1) * (st(0, 0) + 1) * (su(1) + 1)) / ((ns(0) + 1) * (st(1, 1) + 1) * (su(0) + 1));
-  while (st(1, 1) < nd2){;
+  while (st(1, 1) < nd2){
     v = v + vo / (ns(1) + 1);
     if (v <= cutoff){
       result += v;
@@ -84,6 +180,7 @@ double tmtest2(NumericMatrix l, double v, double cutoff, NumericVector nss, Nume
   }
   return result;
 }
+
 
 
 // [[Rcpp::export]]
@@ -187,29 +284,6 @@ List mtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
   return(result);
 }
 
-// [[Rcpp::export]]
-double sumlog(double n1, double n2){
-  if (n1 == n2){
-    return n1 + log(2);
-  }
-  double l = (n1 > n2) ? n1 : n2;
-  double s = (n1 > n2) ? n2 : n1;
-  double result = l;
-  double Q = s - l;
-  double q = exp(Q);
-  double qq = q * q;
-  double c = 1 - q;
-  uint32_t i = 1;
-  double k = q;
-  double next = q * (1-q/2);
-  while (abs(next) > 1e-20){
-    i = i + 2;
-    result += next;
-    k *= qq;
-    next = k*((1 + i * c)/(i*(i + 1)));
-  }
-  return result;
-}
 
 // [[Rcpp::export]]
 List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
@@ -236,7 +310,7 @@ List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
                               _["sdesc"] = s,
                               _["r"] = 0
   );
-  double r = 0;
+  double r = -5000000;
   if (newv <= cutoff){
     r = newv;
   }
@@ -301,6 +375,9 @@ List lmtest(List l, double cutoff, uint8_t rw = 1, uint8_t cl = 1){
     }
   }
   result["r"] = r;
+  if (r == 0){
+    stop("Zero value");
+  }
   return(result);
 }
 

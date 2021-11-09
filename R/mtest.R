@@ -368,6 +368,10 @@ lorder <- function(v){
   return(result)
 }
 
+#' @export
+sl <- function(a, b){
+  return(exp(sumlog(a, b)))
+}
 
 #' @export
 bpval <- function(experiments){
@@ -424,6 +428,14 @@ binomial.coef <- function(n, k){
   return(result)
 }
 
+lbinomial.coef <- function(n, k){
+  result <- 0
+  for (i in 1:k){
+    result <- result + log(n - k + i) - log(i)
+  }
+  return(result)
+}
+
 .tzero <- function(experiments){
   result <- matrix(unlist(Map({function(x) rep(0, length(x))}, experiments)), ncol = ncol(experiments), byrow = T)
   n1 <- sum(unlist(experiments[1,]))
@@ -464,6 +476,52 @@ tbpval <- function(experiments){
   return(v)
 }
 
+ltbpval <- function(experiments){
+  mex <- .toMatrix(experiments)
+  st <- .tzero(mex)
+  n <- sum(mex)
+  denom <- log(n + 1) + log(n + 2) + lbinomial.coef(n, st[1, 2])
+  v <- -denom
+  su <- colSums(st)
+  ns <- rowSums(st)
+  vo <- -log(n + 2) - lbinomial.coef(n+1, st[1, 2]+1)
+  vo <- vo + log(st[1, 2]+1) + log(1 + su[1]) - log(1 + st[1, 1]) - log(su[2]+1)
+  while (st[1, 1] < mex[1, 1]){
+    v <- sumlog(v, vo - log(ns[1] + 1))
+    st[1, 1] <- st[1, 1] + 1
+    st[1, 2] <- st[1, 2] - 1
+    su[1] <- su[1] + 1
+    su[2] <- su[2] - 1
+    vo <- vo + log(st[1, 2]+1) + log(1 + su[1]) - log(1 + st[1, 1]) - log(su[2]+1)
+  }
+  vo <- vo + log(ns[2] + 1) + log(st[1, 1] + 1) + log(su[2] + 1) - log(ns[1] + 1) - log(st[2, 2] + 1) - log(su[1] + 1)
+  while (st[2, 2] < mex[2, 2]){
+    v <- sumlog(v, vo - log(ns[2] + 1))
+    st[2, 1] <- st[2, 1] - 1
+    st[2, 2] <- st[2, 2] + 1
+    su[1] <- su[1] - 1
+    su[2] <- su[2] + 1
+    vo <- vo + log(st[2, 1]+1) + log(1 + su[2]) - log(1 + st[2, 2]) - log(su[1]+1)
+  }
+  return(v)
+}
+
+#' @export
+los.m.test <- function(experiments){
+  mex <- .toMatrix(experiments)
+  cutoff <- ltbpval(experiments)
+  st <- .tzero(mex)
+  n <- sum(mex)
+  denom <- log(n + 1) + log(n + 2) + lbinomial.coef(n, st[1, 2])
+  v <- -denom
+  su <- colSums(st)
+  ns <- rowSums(st)
+  vo <- -log(n + 2) - lbinomial.coef(n+1, st[1, 2]+1)
+  vo <- vo + log(st[1, 2]+1) + log(1 + su[1]) -log(1 + st[1, 1]) - log(su[2]+1)
+  result <- log(2) + ltmtest(st, v, cutoff, ns, su, vo)
+  return(result)
+}
+
 #' One-sided p-val calculation to compare binomial trials
 #'
 #' This function only takes two experiments with two outcomes, usually called
@@ -484,8 +542,10 @@ os.m.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- tbpval(experiments)
   if (cutoff == 0){
-    message(paste('The probability of the result is too low. Probable overflow, ',
-            'the result is unreliable.', sep = ''))
+    message(paste('The probability of the result is too low. Probable underflow. ',
+            'Trying with modified algorithm.', sep = ''))
+    return(exp(los.m.test(experiments)))
+
   }
   st <- .tzero(mex)
   n <- sum(mex)
@@ -499,7 +559,18 @@ os.m.test <- function(experiments){
   return(result)
 }
 
-#' @export
+zsumlog <- function(a, b){
+  if (a == 0){
+    a <- b;
+  }
+  else{
+    if (b != 0){
+      a <- sumlog(a, b)
+    }
+  }
+  return(a)
+}
+
 lm.test <- function(experiments){
   mex <- .toMatrix(experiments)
   cutoff <- lbpval(experiments)
@@ -515,26 +586,12 @@ lm.test <- function(experiments){
     r <- v
   }
   result <- lmtest(list(val=v, desc=st, sdesc=su, r=0), cutoff, 0, 0)
-  if (r == 0){
-    r <- result$r;
-  }
-  else{
-    if (result$r != 0){
-      r <- sumlog(r, result$r)
-    }
-  }
+  r <- zsumlog(r, result$r);
   if (nr > 1){
     for (rw in 2:nr){
       t <- lmtest(list(val=v, desc=st, sdesc=su, r=0), cutoff,
                  rw - 1, 0)
-      if (r == 0){
-        r <- t$r;
-      }
-      else{
-        if (result$r != 0){
-          r <- sumlog(r, t$r)
-        }
-      }
+      r <- zsumlog(r, t$r)
     }
   }
   return(r)
